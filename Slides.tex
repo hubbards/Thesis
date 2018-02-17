@@ -1,0 +1,1163 @@
+% slides for final exam
+
+% preamble
+% draft,handout,professionalfont,notes=show|only,xcolor=dvipsnames
+\documentclass[draft,notes=show,xcolor=dvipsnames]{beamer}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1,OT1]{fontenc}
+\usepackage[expansion,protrusion]{microtype}
+\usepackage{mathpazo}
+\usepackage[scaled]{beramono}
+%\usepackage{natbib}
+\usepackage{mathpartir}
+\usepackage[final]{listings}
+\usepackage{tikz-cd}
+\usepackage{lambda,cc}
+
+% overlap macros for mathmode
+\def\clap#1{\hbox to 0pt{\hss#1\hss}}
+\def\mathllap{\mathpalette\mathllapinternal}
+\def\mathrlap{\mathpalette\mathrlapinternal}
+\def\mathclap{\mathpalette\mathclapinternal}
+\def\mathllapinternal#1#2{\llap{$\mathsurround=0pt#1{#2}$}}
+\def\mathrlapinternal#1#2{\rlap{$\mathsurround=0pt#1{#2}$}}
+\def\mathclapinternal#1#2{\clap{$\mathsurround=0pt#1{#2}$}}
+
+% math operators
+\DeclareMathOperator{\Forall}{\forall}
+\DeclareMathOperator{\Exists}{\exists}
+\DeclareMathOperator{\Not}{\lnot}
+% function mapping
+\newcommand*{\fdef}[1]{\overset{#1}{\mapsto}}
+% placeholder
+\newcommand*{\placeholder}{\underline{\hspace{8pt}}}
+
+% language settings for coq
+\input{coq}
+
+% lstlisting settings
+\lstset{
+  language=coq,
+  tabsize=2,
+  sensitive=true,
+  extendedchars=true,
+  showstringspaces=false,
+  basicstyle=\fontencoding{T1}\ttfamily\scriptsize\color{Black},
+  %identifierstyle={},
+  %keywordstyle=[1]{},
+  %keywordstyle=[2]{},
+  commentstyle={\itshape},
+  %stringstyle={},
+  frame=single,
+}
+
+% commutative diagrams
+\tikzcdset{row sep/normal=4em,column sep/normal=4em}
+
+% customize inference rules
+\renewcommand{\rn}[1]{{\scriptsize\MakeUppercase{#1}}}
+% TODO: what does this do?
+\renewcommand{\DefTirName}[1]{\rn{#1}}
+\def\MathparLineskip{\lineskiplimit=.4em\lineskip=.6em plus 0.2em}
+
+% customize colors / formatting
+\renewcommand{\OB}[1]{\ensuremath{#1}}
+\renewcommand{\CCkeyw}[1]{\OB{\mathbf{#1}}}
+\renewcommand{\CCname}[1]{\OB{\textit{#1}}}
+% vocabulary word / definition
+\newcommand*{\vocab}[1]{\textbf{\textcolor{magenta}{#1}}}
+
+% rule and language names
+\input{names}
+
+% beamer
+
+% stepwise enumerate and itemize
+\newenvironment{stepenum}{\begin{enumerate}[<+-| alert@+>]}{\end{enumerate}}
+\newenvironment{stepitem}{\begin{itemize}[<+-| alert@+>]}{\end{itemize}}
+
+% transparent overlays
+%\setbeamercovered{transparent}
+
+% themes
+\usecolortheme{seahorse}
+\usecolortheme{rose} % lily|orchid|rose
+\useinnertheme{circles}
+
+% remove navigation bar
+%\beamertemplatenavigationsymbolsempty
+
+% grid lines
+% TODO: remove before presentation
+\setbeamertemplate{background}[grid][step=2mm]
+
+% slide numbers
+\setbeamertemplate{footline}[frame number]
+
+% blocks
+%\setbeamertemplate{blocks}[rounded][shadow=true]
+\addtobeamertemplate{block begin}{%
+  \setlength{\abovedisplayskip}{0pt}%
+  \setlength{\belowdisplayskip}{0pt}%
+  \setlength{\abovedisplayshortskip}{0pt}%
+  \setlength{\belowdisplayshortskip}{0pt}}{\vspace*{-1\baselineskip}}
+\addtobeamertemplate{block example begin}{%
+  \setlength{\abovedisplayskip}{0pt}%
+  \setlength{\belowdisplayskip}{0pt}%
+  \setlength{\abovedisplayshortskip}{0pt}%
+  \setlength{\belowdisplayshortskip}{0pt}}{}
+\addtobeamertemplate{block alerted begin}{%
+  \setlength{\abovedisplayskip}{0pt}%
+  \setlength{\belowdisplayskip}{0pt}%
+  \setlength{\abovedisplayshortskip}{0pt}%
+  \setlength{\belowdisplayshortskip}{0pt}}{}
+\addtobeamertemplate{theorem begin}{%
+  \setlength{\abovedisplayskip}{0pt}%
+  \setlength{\belowdisplayskip}{0pt}%
+  \setlength{\abovedisplayshortskip}{0pt}%
+  \setlength{\belowdisplayshortskip}{0pt}}{\vspace*{\baselineskip}}
+\addtobeamertemplate{proof begin}{}{\vspace*{\baselineskip}}
+\addtobeamertemplate{itemize body begin}{%
+  \setlength{\topsep}{0pt}%
+  \setlength{\partopsep}{0pt}}{}
+
+\title[]{A Formal Foundation for Variational Programming Using the Choice Calculus}
+%\subtitle{}
+\author{Spencer Hubbard}
+\institute[OSU EECS]{
+  School of Electrical Engineering and Computer Science\\
+	Oregon State University
+}
+\date[6/13/16]{June 1, 2016}
+
+\begin{document}
+% front matter
+\maketitle
+
+\AtBeginSection[]
+{
+  \begin{frame}<beamer>[squeeze]
+    \frametitle{Outline}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+% main matter
+\section[Intro]{Introduction}
+
+\begin{frame}<2>
+  \frametitle{Introduction}
+  %
+  \begin{abstract}<only@1>
+    ...
+    We prove semantic equivalence rules for the formula choice calculus.
+    ...
+    We prove map and bind operations are sound for an implementation of variational lists.
+    These proofs are written and verified in the language of the Coq proof assistant.
+  \end{abstract}
+  \note[item]<1>{welcome and thank you for attending}
+  \note[item]<1>{abridged version of abstract}
+  %
+  \only<2>{\structure{Main Topics of Thesis}}
+  \begin{enumerate}[<only@2->]
+    \item Semantic equivalence rules for the formula choice calculus
+    \item Sound map and bind operations for option-lists
+    \item Formal verification with Coq proof assistant
+  \end{enumerate}
+  \note[item]<2>{\textbf{all claims} written and verified in Coq}
+  \note[item]<2>{many details are omitted for lack of time}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Motivation}
+  %
+  \only<1>{\structure{Ren\'{e} Descartes, ``A Discourse on the Method''}}
+  \begin{quote}<only@1>
+    ...
+    I judged that I was as prone to error as anyone else, and I rejected as false all the reasoning I had hitherto accepted as valid proof.
+    ...
+    while I was trying to think of all things being false in this way, it was necessarily the case that I, who was thinking them, had to be something;
+    and observing this truth: I am thinking therefore I exist, was so secure and certain that it could not be shaken by any of the most extravagant suppositions of the skeptics, I judged that I could accept it without scruple, as the first principle of the philosophy I was seeking.
+  \end{quote}
+  \note[item]<1>{reference~\cite[p.~18]{descartes}}
+  \note[item]<1>{motivational quote}
+  \note[item]<1>{Descartes' famous statement of certainty ``cogito, ergo sum'' translated as ``I think, therefore I am''}
+  \note[item]<1>{philosophy is method for obtaining knowledge from \textbf{secure foundations}}
+  \note[item]<1>{purpose of thesis is to establish \textbf{secure foundations} for formula choice calculus and variational programming}
+  %
+  \only<2>{\structure{Use Cases}}
+  \begin{itemize}[<only@2>]
+    \item Projectional editing model for variational software
+    \item TypeChef
+    \item Software product lines (CIDE, CFJ, SPLlift, etc.)
+    \item Many more
+  \end{itemize}
+  \note[item]<2>{semantic equivalence rules for formula choice calculus and variational data structures already being used without verification}
+  \note[item]<2>{TypeChef is tool for parsing and type checking C code with preprocessor directives}
+  \note[item]<2>{CIDE is IDE for software product lines}
+  \note[item]<2>{CFJ is typed calculus for software product lines}
+  \note[item]<2>{SPLlift is tool for inter-procedural data-flow analysis on software product lines}
+  \note[item]<2>{other current research here at OSU and elsewhere}
+\end{frame}
+
+\section[FCC]{Formula Choice Calculus}
+
+% customize metavariable for options
+\renewcommand*{\dimMeta}{\dE}
+
+\begin{frame}<2->
+  \frametitle{Denotational Semantics of Choice Calculus}
+  %
+  \only<1>{\structure{Alfred North Whitehead, ``An Introduction to Mathematics''}}
+  \begin{quote}<only@1>
+    By relieving the brain of all unnecessary work, a good notation sets it free to concentrate on more advanced problems, and in effect increases the mental power of the race.
+  \end{quote}
+  \note[item]<1>{reference~\cite{whitehead}}
+  %
+  \begin{block}{Object Syntax}<only@2,3>
+    \begin{syntax}
+      \aE \in \aS &&& \text{Atom} \\
+      \objE \in \objS
+      & ::= & \objEmpty & \text{Empty} \\
+      & | & \tr{\alert<3>{\objE}, \alert<3>{\objE}} & \text{Branch}
+    \end{syntax}
+  \end{block}
+  \begin{block}{Expression Syntax}<only@2,3>
+    \begin{syntax}
+      \dE \in \dS &&& \text{Dimension} \\
+      \ccE \in \ccS
+      & ::= & \objEmpty & \text{Empty} \\
+      & | & \tr{\alert<3>{\ccE}, \alert<3>{\ccE}} & \text{Branch} \\
+      & | & \alert<3>{\chc{\ccE, \ccE}} & \text{Choice}
+    \end{syntax}
+  \end{block}
+  \note[item]<3>{choice calculus is calculus for variation}
+  \note[item]<3>{choice calculus is instantiated with object language}
+  \note[item]<3>{object language is labeled binary trees}
+  \note[item]<3>{differences are highlighted}
+  \note[item]<3>{choices are \vocab{labeled} with \vocab{dimensions}}
+  \note[item]<3>{subexpressions of choices are called \vocab{alternatives}}
+  %
+  \begin{description}[<only@4>][Configuration]
+    \item[Tag] $\tagE \in \tagS = \set{\tagL, \tagR}$
+    \item[Configuration] $\cE \in \cS = \dS \to \tagS$
+  \end{description}
+  \only<4>{\vspace*{-.5\baselineskip}}
+  \begin{block}{Expression Semantics}<only@4>
+    \begin{alignat*}{2}
+      \mathrlap{\ccSem{\cdot} : \ccS \to \cS \to \objS} \\
+      &\ccSem[\cE]{\objEmpty} &&= \objEmpty \\
+      &\ccSem[\cE]{\tr{\ccE_1, \ccE_2}} &&=
+      \tr{\ccSem[\cE]{\ccE_1}, \ccSem[\cE]{\ccE_2}} \\
+      &\ccSem[\cE]{\chc{\ccE_1, \ccE_2}} &&=
+      %\text{if } \cE\ \dE = \tagL
+      %\text{ then } \ccSem[\cE]{\ccE_1}
+      %\text{ else } \ccSem[\cE]{\ccE_2}
+      \begin{cases}
+        \ccSem[\cE]{\ccE_1}, & \text{if }\cE\ \dE = \tagL \\
+        \ccSem[\cE]{\ccE_2}, & \text{otherwise}
+      \end{cases}
+    \end{alignat*}
+  \end{block}
+  \note[item]<4>{\vocab{tag} is either \vocab{left tag} or \vocab{right tag}}
+  \note[item]<4>{\vocab{configuration} is function from dimensions to tags}
+  \note[item]<4>{semantic domain is $\cS \to \objS$}
+  %
+  \begin{exampleblock}{Example}<only@5>
+    Consider object language \objS\ for decimal notation.
+    Then $123, 213 \in \objS$ and $\chc[\dE]{12,21}3 \in \ccS$ if $\dE \in \dS$.
+    \\[10pt]
+    $\ccSem[\cE]{\chc[\dE]{12,21}3} = 123$ if $\dE\fdef{\cE}\tagL$\\
+    $\ccSem[\cE]{\chc[\dE]{12,21}3} = 213$ if $\dE\fdef{\cE}\tagR$
+  \end{exampleblock}
+  \begin{alertblock}{Expression Semantics Is Not Injective}<only@5>
+    $\chc[\dE]{12,21}3 \ne \chc[\dE]{123,213}$ but $\ccSem[]{\chc[\dE]{12,21}3} = \ccSem[]{\chc[\dE]{123,213}}$
+  \end{alertblock}
+  \note[item]<5>{concrete example}
+  \note[item]<5>{numeral sequence $123$ represents ``one hundred twenty three''}
+  \note[item]<5>{numeral sequence $213$ represents ``two hundred thirteen''}
+  \note[item]<5>{will return to issue of injectivity later}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Denotational Semantics of Formulas}
+  %
+  \begin{block}{Formula Syntax}<only@1>
+    \begin{syntax}
+      %\tagE \in \tagS &&& \text{Tag} \\
+      %\dE \in \dS &&& \text{Dimension} \\
+      \fE \in \fS
+      & ::= & \tagE & \text{Tag} \\
+      & | & \dE & \text{Dimension} \\
+      & | & \Not \fE & \text{Complement} \\
+      & | & \fE \lor \fE & \text{Join} \\
+      & | & \fE \land \fE & \text{Meet}
+    \end{syntax}
+  \end{block}
+  %
+  \begin{onlyenv}<2>
+    \structure{Tag Algebra}
+    $$
+      \begin{array}{c|c}
+        \tagE & \Not \tagE \\
+        \hline
+        \tagL & \tagR \\
+        \tagR & \tagL \\
+      \end{array}
+      \qquad
+      \begin{array}{c|cc}
+        \lor & \tagL & \tagR \\
+        \hline
+        \tagL & \tagL & \tagL \\
+        \tagR & \tagL & \tagR \\
+      \end{array}
+      \qquad
+      \begin{array}{c|cc}
+        \land & \tagL & \tagR \\
+        \hline
+        \tagL & \tagL & \tagR \\
+        \tagR & \tagR & \tagR \\
+      \end{array}
+    $$
+  \end{onlyenv}
+  \begin{block}{Formula Semantics}<only@2>
+    \begin{alignat*}{2}
+      &\mathrlap{\fSem{\cdot} : \fS \to \cS \to \tagS} \\
+      &\fSem[\cE]{\tagE} &&= \tagE \\
+      &\fSem[\cE]{\dE} &&= \cE\ \dE \\
+      &\fSem[\cE]{\Not \fE} &&= \Not \fSem[\cE]{\fE} \\
+      &\fSem[\cE]{\fE_1 \lor \fE_2} &&=
+      \fSem[\cE]{\fE_1} \lor \fSem[\cE]{\fE_2} \\
+      &\fSem[\cE]{\fE_1 \land \fE_2} &&=
+      \fSem[\cE]{\fE_1} \land \fSem[\cE]{\fE_2}
+    \end{alignat*}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Formula Equivalence}
+  %
+  \begin{definition}[Formula Equivalence]
+    Consider $\placeholder \equiv \placeholder \subseteq \fS \times \fS$ where $\fE \equiv \fE'$ iff $\fSem{\fE} = \fSem{\fE'}$.
+    \begin{itemize}
+      \item $\equiv$ is an equivalence relation
+      \item $\equiv$ is called \vocab{formula equivalence}
+      \item $\fE, \fE' \in \fS$ are called \vocab{semantically equivalent} if $\fE \equiv \fE'$
+    \end{itemize}
+  \end{definition}
+  \begin{proof}[Informal Proof]
+    $\fSem{\cdot}$ is well-defined with domain \fS\ and codomain $\cS \to \tagS$ and so the inverse images of elements in $\cS \to \tagS$ partition \fS.
+  \end{proof}
+\end{frame}
+
+% customize metavariable for formula choices
+\renewcommand*{\dimMeta}{\fE}
+
+\begin{frame}
+  \frametitle{Denotational Semantics of Formula Choice Calculus}
+  %
+  \begin{block}{Expression Syntax}<only@1,2>
+    \begin{syntax}
+      \fE \in \fS &&& \text{Formula} \\
+      \ccE \in \ccS
+      & ::= & \objEmpty & \text{Empty} \\
+      & | & \tr{\ccE, \ccE} & \text{Branch} \\
+      & | & \chc[\alert<2>{\fE}]{\ccE, \ccE} & \text{Choice}
+    \end{syntax}
+  \end{block}
+  \begin{block}{Expression Semantics}<only@1,2>
+    \begin{alignat*}{2}
+      \mathrlap{\ccSem{\cdot} : \ccS \to \cS \to \objS} \\
+      &\ccSem[\cE]{\objEmpty} &&= \objEmpty \\
+      &\ccSem[\cE]{\tr{\ccE_1, \ccE_2}} &&=
+      \tr{\ccSem[\cE]{\ccE_1}, \ccSem[\cE]{\ccE_2}} \\
+      &\ccSem[\cE]{\chc{\ccE_1, \ccE_2}} &&=
+      %\text{if } \cE\ \dE = \tagL
+      %\text{ then } \ccSem[\cE]{\ccE_1}
+      %\text{ else } \ccSem[\cE]{\ccE_2}
+      \begin{cases}
+        \ccSem[\cE]{\ccE_1}, & \text{if }\alert<2>{\fSem[\cE]{\fE}} = \tagL \\
+        \ccSem[\cE]{\ccE_2}, & \text{otherwise}
+      \end{cases}
+    \end{alignat*}
+  \end{block}
+  \note[item]<2>{extension where choices labeled with formulas instead of dimensions}
+  \note[item]<2>{changes are highlighted}
+  \note[item]<2>{formulas are Boolean expressions in tags and dimensions}
+  \note[item]<2>{\tagL\ is ``true'' and \tagR\ is ``false'' and \dE\ is Boolean variable}
+  \note[item]<2>{can apply all rules of Boolean algebra to formulas}
+  \note[item]<2>{semantic domain for formulas is $\cS \to \tagS$}
+  \note[item]<2>{... which is truth assignment for dimensions}
+  %
+  \begin{exampleblock}{Example}<only@3>
+    $\chc{12,21}3 \in \ccS$ if $\fE = \dE_1 \lor \dE_2$ and $\dE_1, \dE_2 \in \dS$
+    \\[10pt]
+    $\ccSem[\cE]{\chc{12,21}3} = 123$ if $\dE_1 \fdef{\cE} \tagL$ or $\dE_2\fdef{\cE}\tagL$\\
+    $\ccSem[\cE]{\chc{12,21}3} = 213$ if $\dE_1 \fdef{\cE} \tagR$ and $\dE_2\fdef{\cE}\tagR$
+  \end{exampleblock}
+  \begin{alertblock}{Expression Semantics Is Not Injective}<only@3>
+    $\chc{12,21}3 \ne \chc{123,213}$ but $\ccSem[]{\chc{12,21}3} = \ccSem[]{\chc{123,213}}$
+  \end{alertblock}
+  \note[item]<3>{concrete example}
+  \note[item]<3>{same object language as before}
+  \note[item]<3>{formulas provide more control over selection than dimensions}
+  \note[item]<3>{formulas don't addressed issue of injectivity, in fact they add to it}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Expression Equivalence}
+  %
+  \begin{definition}[Expression Equivalence]
+    Consider $\placeholder \equiv \placeholder \subseteq \ccS \times \ccS$ where $\ccE \equiv \ccE'$ iff $\ccSem{\ccE} = \ccSem{\ccE'}$.
+    \begin{itemize}
+      \item $\equiv$ is an equivalence relation
+      \item $\equiv$ is called \vocab{expression equivalence}
+      \item $\ccE, \ccE' \in \ccS$ are called \vocab{semantically equivalent} if $\ccE \equiv \ccE'$
+    \end{itemize}
+  \end{definition}
+  \begin{proof}
+    $\ccSem{\cdot}$ is well-defined with domain \ccS\ and codomain $\cS \to \objS$ and so the inverse images of elements in $\cS \to \objS$ partition \ccS.
+  \end{proof}
+  \note[item]{to address issue ... formal definition of expression equivalence}
+  \note[item]{relation on expressions}
+  \note[item]{$\equiv$ is equivalence relation ... here is proof}
+  \note[item]{correspondence between partitions and equivalence relations}
+  \note[item]{the equivalence relation corresponding to this partition is precisely $\equiv$}
+  \note[item]{useful for replacing less efficient expressions with more efficient ones}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Syntactic Rules for Expression Equivalence}
+  %
+  \only<1>{\structure{Carl Friedrich Gauss, Doctoral Dissertation}}
+  \begin{quote}<only@1>
+    ...
+    what is called a solution to an equation is, in reality, nothing but the reduction of the equation to prime equations---the solution is not exhibited but symbolized---and if you express a root of the equation $[\,x^2 = 2\,]$ by $[\,\sqrt{2}\,]$, you have not solved it nor done anything more than if you devised some symbol to denote a root of the equation $[\,x^2 - 2 = 0\,]$ and placed the root equal to this symbol
+    ...
+  \end{quote}
+  \note[item]<1>{reference~\cite[p.~275]{ayoub80}}
+  \note[item]<1>{Gauss' opinion of solutions of polynomial equations by radicals}
+  \note[item]<1>{reduction similar to deriving $\ccE \equiv \ccE'$ without unfolding $\equiv$}
+  \note[item]<1>{can derive $\ccE \equiv \ccE'$ without unfolding $\equiv$ using syntactic rules}
+  \note[item]<1>{use cases apply these rules}
+  \note[item]<1>{most rules are omitted for lack of time}
+  %
+  \begin{onlyenv}<2>
+    \begin{block}{Expression Equivalence Rules}
+      \vspace*{.5\baselineskip}
+      \begin{mathpar}
+        \inferrule[\rRefl]
+          {}
+          { \ccE \equiv \ccE }
+          
+        \inferrule[\rSymm]
+          { \ccE \equiv \ccE' }
+          { \ccE' \equiv \ccE }
+  
+        \inferrule[\rTran]
+          { \ccE_1 \equiv \ccE_2 \\
+            \ccE_2 \equiv \ccE_3 }
+          { \ccE_1 \equiv \ccE_3 }
+      \end{mathpar}
+    \end{block}
+    \begin{proof}
+      $\equiv$ is an equivalence relation.
+    \end{proof}
+  \end{onlyenv}
+  %
+  \begin{onlyenv}<3>
+    \begin{block}{Choice Congruence Rule}
+      \vspace*{.5\baselineskip}
+      \begin{mathpar}
+        \inferrule[\rCCong]
+          { \ccE_1 \equiv \ccE_1' \\
+            \ccE_2 \equiv \ccE_2' \\
+            \fE \equiv \fE' }
+          { \chc{\ccE_1, \ccE_2}
+            \equiv
+            \chc[\fE']{\ccE_1', \ccE_2'} }
+      \end{mathpar}
+    \end{block}
+    \begin{proof}[Proof (Idea)]
+      Unfold definition of $\equiv$.
+    \end{proof}
+  \end{onlyenv}
+  %
+  \begin{onlyenv}<4>
+    \begin{block}{Choice Transposition Rule}
+      \vspace*{.5\baselineskip}
+      \begin{mathpar}
+        \inferrule[\rCTrans]
+          {}
+          { \chc{\ccE_1, \ccE_2}
+            \equiv
+            \chc[\Not \fE]{\ccE_2, \ccE_1} }
+      \end{mathpar}
+    \end{block}
+    \begin{proof}[Proof (Idea)]
+      Unfold definition of $\equiv$.
+    \end{proof}
+  \end{onlyenv}
+  \note[item]<4>{semantics of choice is invariant under transposition of alternatives and complementation of label}
+  \note[item]<4>{useful for deriving rules from other rules}
+  \note[item]<4>{provide meaningful proofs ... show relationships}
+  \note[item]<4>{avoid duplication of logic (and code) in proofs}
+  %
+  \begin{onlyenv}<5>
+    \begin{block}{Choice Simplification Rules}
+      \vspace*{.5\baselineskip}
+      \begin{mathpar}
+        \inferrule[\rCIdemp]
+          {}
+          { \chc{\ccE, \ccE} \equiv \ccE }
+        
+        \inferrule[\rCL]
+          {}
+          { \chc[\tagL]{\ccE_1, \ccE_2} \equiv \ccE_1 }
+        
+        \inferrule[\rCR]
+          {}
+          { \chc[\tagR]{\ccE_1, \ccE_2} \equiv \ccE_2 }
+      \end{mathpar}
+    \end{block}
+    \begin{proof}
+      Show \rCIdemp\ and \rCL\ by unfolding definition of $\equiv$ and derive \rCR\ from \rCL\ as follows:
+      \begin{align*}
+        \chc[\tagR]{\ccE_1, \ccE_2}
+        &\equiv \chc[\Not \tagR]{\ccE_2, \ccE_1}
+        &&\text{by \rCTrans}\\
+        &\equiv \chc[\tagL]{\ccE_2, \ccE_1}
+        &&\text{by }\Not \tagR \equiv \tagL\\
+        &\equiv \ccE_2
+        &&\text{by \rCL}
+        \qedhere
+      \end{align*}
+    \end{proof}
+  \end{onlyenv}
+  \note[item]<5>{left-to-right: replace choice with alternative}
+  %
+  \begin{onlyenv}<6>
+    \begin{block}{Formula Choice Rules}
+      \vspace*{.5\baselineskip}
+      \begin{mathpar}
+        \inferrule[\rCJoin]
+          {}
+          { \chc[\fE_1]{
+              \ccE_1,
+              \chc[\fE_2]{\ccE_1, \ccE_2}}
+            \equiv
+            \chc[(\fE_1 \lor \fE_2)]{\ccE_1, \ccE_2} }
+
+        \inferrule[\rCMeet]
+          {}
+          { \chc[\fE_1]{
+              \chc[\fE_2]{\ccE_1, \ccE_2},
+              \ccE_2}
+            \equiv
+            \chc[(\fE_1 \land \fE_2)]{\ccE_1, \ccE_2} }
+      \end{mathpar}
+    \end{block}
+    \begin{proof}
+      Show \rCJoin\ by unfolding definition of $\equiv$ and derive \rCMeet\ from \rCJoin\ as follows:
+      \begin{align*}
+        \chc[\fE_1]{
+          \chc[\fE_2]{\ccE_1, \ccE_2},
+          \ccE_2}
+        &\equiv
+        \chc[\Not\fE_1]{
+          \ccE_2,
+          \chc[\Not\fE_2]{\ccE_2, \ccE_1}}
+        &&\text{by \rCTrans} \\
+        &\equiv \chc[(\Not \fE_1 \lor \Not \fE_2)]{\ccE_2, \ccE_1}
+        &&\text{by \rCJoin}\\
+        &\equiv \chc[\Not(\fE_1 \land \fE_2)]{\ccE_2, \ccE_1}
+        &&\text{by De Morgan's law}\\
+        &\equiv \chc[(\fE_1 \land \fE_2)]{\ccE_1, \ccE_2}
+        &&\text{by \rCTrans}
+        \qedhere
+      \end{align*}
+    \end{proof}
+  \end{onlyenv}
+  \note[item]<6>{left-to-right: remove redundant alternatives in nested choices}
+  %
+  \begin{onlyenv}<7>
+    \begin{block}{Choice Merge Rules}
+      \vspace*{.5\baselineskip}
+      \begin{mathpar}
+        \inferrule[\rCCMergeL]
+          {}
+          { \chc{
+              \chc{\ccE_1, \ccE_2},
+              \ccE_3}
+            \equiv
+            \chc{\ccE_1, \ccE_3} }
+        
+        \inferrule[\rCCMergeR]
+          {}
+          { \chc{
+              \ccE_1,
+              \chc{\ccE_2, \ccE_3}}
+            \equiv
+            \chc{\ccE_1, \ccE_3} }
+      \end{mathpar}
+    \end{block}
+    \begin{proof}
+      Show \rCCMergeL\ by unfolding definition of $\equiv$ and derive \rCCMergeR\ from \rCCMergeL\ as follows:
+      \begin{align*}
+        \chc{\ccE_1, \chc{\ccE_2, \ccE_3}}
+        &\equiv
+        \chc[\Not\fE]{
+          \chc[\Not\fE]{\ccE_3, \ccE_2},
+          \ccE_1}
+        &&\text{by \rCTrans} \\
+        &\equiv \chc[\Not\fE]{\ccE_3, \ccE_1}
+        &&\text{by \rCCMergeL} \\
+        &\equiv \chc{\ccE_1, \ccE_3}
+        &&\text{by \rCTrans}
+        \qedhere
+      \end{align*}
+    \end{proof}
+  \end{onlyenv}
+  \note[item]<7>{left-to-right: remove unselectable alternatives in nested choices}
+  \note[item]<7>{similar pattern to proofs for other rules}
+  %
+  \begin{onlyenv}<8>
+    \begin{block}{Choice Commutation Rules}
+      \vspace*{.5\baselineskip}
+      \begin{mathpar}
+        \inferrule[\rCCSwapL]
+          {}
+          { \chc[\fE_1]{
+              \chc[\fE_2]{\ccE_1, \ccE_2},
+              \ccE_3}
+            \equiv
+            \chc[\fE_2]{
+              \chc[\fE_1]{\ccE_1, \ccE_3},
+              \chc[\fE_1]{\ccE_2, \ccE_3}} }
+        
+        \inferrule[\rCCSwapR]
+          {}
+          { \chc[\fE_1]{
+              \ccE_1,
+              \chc[\fE_2]{\ccE_2, \ccE_3}}
+            \equiv
+            \chc[\fE_2]{
+              \chc[\fE_1]{\ccE_1, \ccE_2},
+              \chc[\fE_1]{\ccE_1, \ccE_3}} }
+      \end{mathpar}
+    \end{block}
+    \begin{proof}
+      Show \rCCSwapL\ by unfolding definition of $\equiv$ and derive \rCCSwapR\ from \rCCSwapL\ as follows:
+      \begin{align*}
+        \chc[\fE_1]{
+          \ccE_1,
+          \chc[\fE_2]{\ccE_2, \ccE_3}}
+        &\equiv
+        \chc[\Not\fE_1]{
+          \chc[\fE_2]{\ccE_2, \ccE_3},
+          \ccE_1}
+        &&\text{by \rCTrans} \\
+        &\equiv
+        \chc[\fE_2]{
+          \chc[\Not\fE_1]{\ccE_2, \ccE_1},
+          \chc[\Not\fE_1]{\ccE_3, \ccE_1}}
+        &&\text{by \rCCSwapL} \\
+        &\equiv
+        \chc[\fE_2]{
+          \chc[\fE_1]{\ccE_1, \ccE_2},
+          \chc[\fE_1]{\ccE_1, \ccE_3}}
+        &&\text{by \rCTrans}
+        \qedhere
+      \end{align*}
+    \end{proof}
+  \end{onlyenv}
+  \note[item]<8>{right-to-left: remove redundant alternatives in nested choices}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Formal Verification}
+  \setlength{\abovedisplayskip}{.4\baselineskip}%
+  \setlength{\belowdisplayskip}{.4\baselineskip}%
+  \structure{Informal Proof of \rCCMergeR}
+  \begin{align*}
+    \chc{\ccE_1, \chc{\ccE_2, \ccE_3}}
+    &\equiv \chc[\Not\fE]{\chc[\Not\fE]{\ccE_3, \ccE_2}, \ccE_1}
+    &&\text{by \rCTrans} \\
+    &\equiv \chc[\Not\fE]{\ccE_3, \ccE_1}
+    &&\text{by \rCCMergeL} \\
+    &\equiv \chc{\ccE_1, \ccE_3}
+    &&\text{by \rCTrans}
+    \qedhere
+  \end{align*}
+  \structure{Formal Statement and Proof of \rCCMergeR\ in Coq}
+  \begin{lstlisting}[gobble=4]
+    Theorem CCMergeR : forall (f : Formula) (l r e : CC),
+                       Chc f l (Chc f e r) =E= Chc f l r.
+    Proof.
+      intros f l r e.
+      rewrite -> ChcCongR with (r' := Chc (~ f) r e) by apply ChcTrans.
+      rewrite -> ChcTrans.
+      rewrite -> CCMergeL.
+      rewrite <- CCTrans.
+      reflexivity.
+    Qed.
+  \end{lstlisting}
+  \note[item]{informal and formal proofs are similar}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Generalization}
+  %
+  \begin{onlyenv}<1>
+    \structure{How to Add Alternatives to Choices}
+    \begin{enumerate}
+      \item Add alternatives to syntax of choices
+      \item Add tags to set of tags
+      \item Add cases to semantics of choices
+    \end{enumerate}
+    \begin{alertblock}{Limitation}
+      Set of tags must form a Boolean algebra but there are \textbf{no} Boolean algebras with odd numbers of elements.
+      Therefore, we \textbf{cannot} add an odd number of alternatives to choices.
+    \end{alertblock}
+  \end{onlyenv}
+  \note[item]<1>{natural way to extend choices}
+  \note[item]<1>{proof of limitation would take us too far afield}
+  %
+  \begin{onlyenv}<2>
+    \structure{Tag Group}
+    $$
+      \begin{array}{c|cc}
+        \vartriangle & \tagL & \tagR \\
+        \hline
+        \tagL & \tagR & \tagL \\
+        \tagR & \tagL & \tagR \\
+      \end{array}
+    $$
+    \TODO{fill out}
+  \end{onlyenv}
+  \note[item]<2>{$\tagE_1 \vartriangle \tagE_2 = (\tagE_1 \land \Not \tagE_2) \lor (\tagE_2 \land \Not \tagE_1)$}
+  \note[item]<2>{$\vartriangle$ is \vocab{symmetric difference} (or \vocab{exclusive or})}
+  \note[item]<2>{\tagR\ is the identity element}
+  %
+  \begin{onlyenv}<3>
+    \structure{Tag Algebra with Four Tags}
+    $$
+      \begin{array}{c|c}
+        \tagE & \Not \tagE \\
+        \hline
+        \tagLL & \tagRR \\
+        \tagLR & \tagRL \\
+        \tagRL & \tagLR \\
+        \tagRR & \tagLL \\
+      \end{array}
+      \qquad
+      \begin{array}{c|cccc}
+        \lor & \tagLL & \tagLR & \tagRL & \tagRR \\
+        \hline
+        \tagLL & \tagLL & \tagLL & \tagLL & \tagLL \\
+        \tagLR & \tagLL & \tagLR & \tagLL & \tagLR \\
+        \tagRL & \tagLL & \tagLL & \tagRL & \tagRL \\
+        \tagRR & \tagLL & \tagLR & \tagRL & \tagRR \\
+      \end{array}
+      \qquad
+      \begin{array}{c|cccc}
+        \land & \tagLL & \tagLR & \tagRL & \tagRR \\
+        \hline
+        \tagLL & \tagLL & \tagLR & \tagRL & \tagRR \\
+        \tagLR & \tagLR & \tagLR & \tagRR & \tagRR \\
+        \tagRL & \tagRL & \tagRR & \tagRL & \tagRR \\
+        \tagRR & \tagRR & \tagRR & \tagRR & \tagRR \\
+      \end{array}
+    $$
+    \structure{Example Rule Change}
+    \begin{mathpar}
+      \inferrule[\rCCMerge]
+        { \ccE_i = \chc{\ccE_{i1}, \ccE_{i2}, \ccE_{i3}, \ccE_{i4}} \\
+          \Forall i \in \set{1, 2, 3, 4} }
+        { \chc{\ccE_1, \ccE_2, \ccE_3, \ccE_4}
+          \equiv
+          \chc{\ccE_{11}, \ccE_{22}, \ccE_{33}, \ccE_{44}} }
+    \end{mathpar}
+  \end{onlyenv}
+  \note[item]<3>{example with four alternatives}
+  \note[item]<3>{Boolean algebra on four tags}
+\end{frame}
+
+\section[VP]{Variational Programming}
+
+\begin{frame}
+  \frametitle{Variational Value}
+  %
+  \begin{block}{Value Syntax}<only@1>
+    \begin{syntax}
+      \val \in \Val &&& \text{Value} \\
+      \var \in \Var[\Val]
+      & ::= & \val & \text{One} \\
+      & | & \chc{\var, \var} & \text{Choice}
+    \end{syntax}
+  \end{block}
+  \begin{block}{Selection Function}<only@1>
+    \begin{alignat*}{2}
+      &\mathrlap{\sel : \cS \to \Var[\Val] \to \Val} \\
+      &\sel\ \cE\ \val &&= \val \\
+      &\sel\ \cE\ \chc{\var_1, \var_2} &&=
+      \begin{cases}
+        \sel\ \cE\ \var_1, & \text{if }\fSem[\cE]{\fE} = \tagL \\
+        \sel\ \cE\ \var_2, & \text{otherwise}
+      \end{cases}
+    \end{alignat*}
+  \end{block}
+  \note[item]<1>{arbitrary types are named \Val\ and \ValY}
+  \note[item]<1>{naming convention established by Ren\'{e} Descartes in ``La G\'{e}om\'{e}trie''}
+  \note[item]<1>{letters near end of alphabet for variables}
+  \note[item]<1>{letters near beginning or middle of alphabet for constants}
+  \note[item]<1>{variational values are choice calculus instantiated with trivial object language}
+  \note[item]<1>{no construct for branches}
+  \note[item]<1>{\sel\ implements expression semantics}
+  %
+  \begin{exampleblock}{Example}<only@2>
+    $\chc[\dE_1]{1,\chc[\dE_2]{2,3}} \in \Var[\mathbb{Z}]$ if $\dE_1, \dE_2 \in \dS$\\
+    \begin{align*}
+      \sel\ \cE\ \chc[\dE_1]{1,\chc[\dE_2]{2,3}}
+      &= \sel\ \cE\ \chc[\dE_2]{2,3} &&\text{if } \dE_1 \fdef{c} \tagR \\
+      &= \sel\ \cE\ 2 &&\text{if } \dE_2 \fdef{c} \tagL \\
+      &= 2 \\
+      \sel\ \cE\ \chc[\dE_1]{1,\chc[\dE_2]{2,3}}
+      &= \sel\ \cE\ \chc[\dE_2]{2,3} &&\text{if } \dE_1 \fdef{c} \tagR \\
+      &= \sel\ \cE\ 3 &&\text{if } \dE_2 \fdef{c} \tagR \\
+      &= 3
+    \end{align*}
+  \end{exampleblock}
+  \note[item]<2>{$\mathbb{Z}$ is integers}
+  \note[item]<2>{can select the leftmost alternative by $\dE_1 \fdef{c} \tagL$}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Variational Function}
+  %
+  \begin{definition}[Soundness]
+    For arbitrary functions $\varphi : \Var[\Val] \to \Var[\ValY]$ and $\psi : \Val \to \ValY$, say
+    \begin{itemize}
+      \item $\varphi$ and $\psi$ are \vocab{sound} \alert<2>{at $\cE \in \cS$} iff $\sel\ \cE \comp \varphi = \psi \comp \sel\ \cE$, i.e., TFDC:
+      $$
+        \begin{tikzcd}
+          \Var[\Val] \ar[d, "\sel\ \cE"'] \ar[r, "\varphi"] \ar[dr, dashed] &
+          \Var[\ValY] \ar[d, "\sel\ \cE"] \\
+          \Val \ar[r, "\psi"'] & \ValY
+        \end{tikzcd}
+      $$
+      \item $\varphi$ and $\psi$ are \vocab{sound} iff they are sound \alert<2>{at every configuration}
+    \end{itemize}
+  \end{definition}
+  \note[item]<2>{$\varphi$ on variational values and $\psi$ on plain values}
+  \note[item]<2>{$\varphi$ does same thing as $\psi$ to selected variants}
+  \note[item]<2>{$\varphi$ does same thing as $\psi$ to all variants}
+  \note[item]<2>{TFDC means ``the following diagram commutes''}
+  \note[item]<2>{\cE\ is universally qualified in second definition}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Variational List}
+  %
+  \begin{onlyenv}<1>
+  \begin{block}{List Syntax}
+    \begin{syntax}
+      \val \in \Val &&& \text{Element} \\
+      \lst \in \Lst
+      & ::= & \nil & \text{Nil} \\
+      & | & \val \cons \lst & \text{Cons}
+    \end{syntax}
+  \end{block}
+  \vspace*{-.5\baselineskip}
+  \begin{description}[Option-List]
+    \item[Option] $\LVal = \Val \cup \set{\Bot}$
+    \item[Option-List] $\OLst = \Lst[(\Var)]$
+  \end{description}
+  \vspace*{-.5\baselineskip}
+  \begin{block}{Selection Function}
+    \begin{alignat*}{2}
+      &\mathrlap{\osel : \cS \to \OLst \to \Lst} \\
+      &\osel\ \cE\ \nil &&= \nil \\
+      &\osel\ \cE\ (\var \cons \lst) &&=
+      \begin{cases}
+        \val \cons \osel\ \cE\ \lst, & \text{if }\sel\ \cE\ \var = \val \\
+        \osel\ \cE\ \lst, & \text{otherwise}
+      \end{cases}
+    \end{alignat*}
+  \end{block}
+  \end{onlyenv}
+  \note[item]<1>{standard list syntax}
+  \note[item]<1>{options are either a value or a special bottom value}
+  \note[item]<1>{option-lists are lists of variational options}
+  \note[item]<1>{\osel\ discards bottom values}
+  \note[item]<1>{option-lists implement variational lists}
+  %
+  \begin{exampleblock}{Example}<only@2>
+    $1 \cons 3, 1 \cons 2 \cons 3 \in \Lst[\mathbb{Z}]$ and
+    $1 \cons \chc[\dE]{\bot, 2} \cons 3 \in \OLst[\mathbb{Z}]$ if $\dE \in \dS$\\
+    \begin{align*}
+      \osel\ \cE\ (1 \cons \chc[\dE]{\bot, 2} \cons 3)
+      &= 1 \cons \osel\ \cE\ (\chc[\dE]{\bot, 2} \cons 3) \\
+      &= 1 \cons \osel\ \cE\ 3
+      &&\text{if } \dE \fdef{\cE} \tagL \\
+      &= 1 \cons 3 \\
+      \osel\ \cE\ (1 \cons \chc[\dE]{\bot, 2} \cons 3)
+      &= 1 \cons \osel\ \cE\ (\chc[\dE]{\bot, 2} \cons 3) \\
+      &= 1 \cons 2 \cons \osel\ \cE\ 3
+      &&\text{if } \dE \fdef{\cE} \tagR \\
+      &= 1 \cons 2 \cons 3
+    \end{align*}
+  \end{exampleblock}
+  \note[item]<2>{omitting last cons and nil in examples}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Option-List Function}
+  %
+  \begin{definition}[Soundness]
+    For arbitrary functions $\varphi : \alert<2>{\OLst[]}\Val \to \alert<2>{\OLst[]}\ValY$ and $\psi : \alert<2>{\Lst[]}\Val \to \alert<2>{\Lst[]}\ValY$, say
+    \begin{itemize}
+      \item $\varphi$ and $\psi$ are \vocab{sound} at $\cE \in \cS$ iff $\alert<2>{\osel}\ \cE \comp \varphi = \psi \comp \alert<2>{\osel}\ \cE$, i.e., TFDC:
+      $$
+        \begin{tikzcd}
+          \alert<3>{\OLst[]}\Val \ar[d, "\alert<3>{\osel}\ \cE"'] \ar[r, "\varphi"] \ar[dr, dashed] &
+          \alert<3>{\OLst[]}\ValY \ar[d, "\alert<3>{\osel}\ \cE"] \\
+          \alert<3>{\Lst[]}\Val \ar[r, "\psi"'] & \alert<3>{\Lst[]}\ValY
+        \end{tikzcd}
+      $$
+      \item $\varphi$ and $\psi$ are \vocab{sound} iff they are sound at every configuration
+    \end{itemize}
+  \end{definition}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Map}
+  %
+  \begin{block}{List Map Function}<only@1-3>
+    \begin{alignat*}{2}
+      &\mathrlap{\lmap : \alert<2>{(\Val \to \ValY)} \to \alert<3>{\Lst \to \Lst[\ValY]}} \\
+      &\lmap\ \varphi\ \nil &&= \nil \\
+      &\lmap\ \varphi\ (\val \cons \lst)
+      &&= \varphi\ \val \cons \lmap\ \varphi\ \lst
+    \end{alignat*}
+  \end{block}
+  \begin{block}{Option-List Map Function}<only@1-3>
+    \begin{alignat*}{2}
+      &\mathrlap{\omap : \alert<2>{(\Val \to \ValY)} \to \alert<3>{\OLst \to \OLst[\ValY]}} \\
+      &\omap\ \varphi\ \nil &&= \nil \\
+      &\omap\ \varphi\ (\var \cons \lst)
+      &&= \hmap\ \varphi\ \var \cons \omap\ \varphi\ \lst \\[10pt]
+      &\mathrlap{\hmap : (\Val \to \ValY) \to \Var \to \VarY}
+    \end{alignat*}
+  \end{block}
+  \note[item]<3>{\lmap\ applies $\varphi$ to each list element}
+  \note[item]<3>{\omap\ applies $\varphi$ to each $\ne \bot$ variant of option-list elements}
+  \note[item]<3>{\hmap\ maps $\varphi$ over variational option}
+  %
+  \begin{exampleblock}{Example}<only@4>
+    \vspace*{-1\baselineskip}
+    \begin{align*}
+      \lmap\ (\lam{x}{x^2})\ (1 \cons 2 \cons 3)
+      &= 1 \cons \lmap\ (\lam{x}{x^2})\ (2 \cons 3) \\
+      &= 1 \cons 4 \cons \lmap\ (\lam{x}{x^2})\ 3 \\
+      &= 1 \cons 4 \cons 9
+    \end{align*}
+  \end{exampleblock}
+  \begin{exampleblock}{Example}<only@4>
+    \vspace*{-1\baselineskip}
+    \begin{multline*}
+      \omap\ (\lam{x}{x^2})\ (\chc[\dE]{1, 2} \cons \chc[\dE]{3, \bot}) \\
+      \begin{aligned}
+        &= \chc[\dE]{1, 4} \cons \omap\ (\lam{x}{x^2})\ \chc[\dE]{3, \bot} \\
+        &= \chc[\dE]{1, 4} \cons \chc[\dE]{9, \bot}
+      \end{aligned}
+    \end{multline*}
+  \end{exampleblock}
+  \note[item]<4>{omitting last cons and nil in examples}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Soundness of Map Function}
+  %
+  \begin{theorem}
+    For each $\varphi : \Val \to \ValY$, \alert<2>{$\omap\ \varphi$} and \alert<2>{$\lmap\ \varphi$} are sound, i.e., for each $\cE \in \cS$, TFDC:
+    $$
+      \begin{tikzcd}
+        \OLst \ar[d, "\osel\ \cE"'] \ar[r, "\omap\ \varphi"] \ar[dr, dashed] &
+        \OLst[\ValY] \ar[d, "\osel\ \cE"] \\
+        \Lst \ar[r, "\lmap\ \varphi"'] &
+        \Lst[\ValY]
+      \end{tikzcd}
+    $$
+  \end{theorem}
+  \begin{proof}[Proof (Idea)]
+    Show
+    $
+      (\osel\ \cE \comp \omap\ \varphi)\ \lst =
+      (\lmap\ \varphi \comp \osel\ \cE)\ \lst
+    $
+    by structural induction on $\lst \in \OLst$.
+  \end{proof}
+  \note[item]<2>{proof is omitted for lack of time}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Bind}
+  %
+  \begin{block}{List Bind Function}<only@1,2>
+    \begin{alignat*}{2}
+      &\mathrlap{\lbind : (\Val \to \alert<2>{\Lst[]}\ValY) \to \Lst \to \Lst[\ValY]} \\
+      &\lbind\ \varphi\ \nil &&= \nil \\
+      &\lbind\ \varphi\ (\val\cons\lst)
+      &&= \varphi\ \val \concat \lbind\ \varphi\ \lst
+    \end{alignat*}
+  \end{block}
+  \begin{block}{Option-List Bind Function}<only@1,2>
+    \begin{alignat*}{2}
+      &\mathrlap{\obind : (\Val \to \alert<2>{\OLst[]}\ValY) \to \OLst \to \OLst[\ValY]} \\
+      &\obind\ \varphi\ \nil &&= \nil \\
+      &\obind\ \varphi\ (\var\cons\lst)
+      &&= \hbind\ \varphi\ \var \concat \obind\ \varphi\ \lst \\[10pt]
+      &\mathrlap{\hbind : (\Val \to \OLst[\ValY]) \to \Var \to \OLst[\ValY]}
+    \end{alignat*}
+  \end{block}
+  \note[item]<2>{\lbind\ applies $\varphi$ to each list element and joins results}
+  \note[item]<2>{\obind\ applies $\varphi$ to each $\ne \bot$ variant of option-list elements and joins results}
+  \note[item]<2>{\hbind\ applies $\varphi$ to variational options, for choices it applies to alternatives and zips together results}
+  \note[item]<2>{return types of first arguments differ}
+  %
+  \begin{exampleblock}{Example}<only@3>
+    \vspace*{-1\baselineskip}
+    \begin{multline*}
+      \lbind\ (\lam{x}{x \cons x^2})\ (1 \cons 2 \cons 3) \\
+      \begin{aligned}
+        &= 1 \cons 1 \concat \lbind\ (\lam{x}{x \cons x^2})\ (2 \cons 3) \\
+        &= 1 \cons 1 \cons 2 \cons 4 \concat \lbind\ (\lam{x}{x \cons x^2})\ 3 \\
+        &= 1 \cons 1 \cons 2 \cons 4 \cons 3 \cons 9
+      \end{aligned}
+    \end{multline*}
+  \end{exampleblock}
+  \begin{exampleblock}{Example}<only@3>
+    Let $\varphi = \lam{x}{\chc[\dE']{x, -x} \cons x^2}$. Then
+    \begin{multline*}
+      \obind\ \varphi\ (\chc[\dE]{1, 2} \cons \chc[\dE]{3, \bot}) \\
+      \begin{aligned}
+        &= \chc[\dE]{\chc[\dE']{1, -1}, \chc[\dE']{2, -2}} \cons \chc[\dE]{1, 4} \cons \obind\ \varphi\ \chc[\dE]{3, \bot} \\
+        &= \chc[\dE]{\chc[\dE']{1, -1}, \chc[\dE']{2, -2}} \cons \chc[\dE]{1, 4} \cons \chc[\dE]{\chc[\dE']{3, -3}, \bot} \cons \chc[\dE]{9, \bot}
+      \end{aligned}
+    \end{multline*}
+  \end{exampleblock}
+  \note[item]<3>{omitting last cons and nil in examples}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Soundness of Bind Function}
+  %
+  \begin{theorem}
+    For each \alert<2>{$\varphi : \Val \to \OLst[\ValY]$} and \alert<2>{$\cE \in \cS$}, if \alert<2>{$\psi = \osel\ \cE \comp \varphi$}, then \alert<3>{$\obind\ \varphi$} and \alert<3>{$\lbind\ \psi$} are sound \alert<3>{at \cE}, i.e., TFDC:
+    $$
+      \begin{tikzcd}
+        \OLst \ar[d, "\osel\ \cE"'] \ar[r, "\obind\ \varphi"] \ar[dr, dashed] &
+        \OLst[\ValY] \ar[d, "\osel\ \cE"] \\
+        \Lst \ar[r, "\lbind\ \psi"'] &
+        \Lst[\ValY]
+      \end{tikzcd}
+    $$
+  \end{theorem}
+  \begin{proof}[Proof (Idea)]
+    Show
+    $
+      (\osel\ \cE \comp \obind\ \varphi)\ \lst =
+      (\lbind\ \psi \comp \osel\ \cE)\ \lst
+    $
+    by structural induction on $\lst \in \OLst$.
+  \end{proof}
+  \note[item]<3>{must compose $\varphi$ with $\osel\ \cE$ for type $\Val \to \Lst[\ValY]$}
+  \note[item]<3>{no single function $\obind\ \varphi$ is sound with}
+  \note[item]<3>{instead sound with family of functions indexed by \cE}
+  \note[item]<3>{proof is omitted for lack of time}
+\end{frame}
+
+\begin{frame}<0>[fragile]
+  \frametitle{Generalization}
+  %
+  \only<1>{\structure{Leonhard Euler, Elements of Algebra}}
+  \begin{quote}<only@1>
+    When it is required to extract the root of a negative number, a great difficulty arises; since there is no assignable number, the square of which would be a negative quantity
+    ...
+    we are lead to the idea of numbers, which from there nature are impossible; and therefore they are usually called imaginary quantities, because they exist merely in the imagination ...
+    But notwithstanding this, these numbers present themselves to the mind; they exist in our imagination and we still have a sufficient idea of them; ...
+    for this reason also, nothing prevents us from making use of these imaginary numbers, and employing them in calculations ...
+  \end{quote}
+  \note[item]<1>{reference~\cite[p.~42--43]{euler}}
+  %
+  \only<2>{\structure{Variational Data Structure}}
+  \begin{enumerate}[<only@2>]
+    \item type constructor $\TConsU[(\cdot)]$
+    \item type constructor $\TConsW[(\cdot)]$ for \vocab{implementation} of $\Var[]\TConsU[(\cdot)]$
+    \item function $\wsel : \cS \to \TConsW \to \TConsU$ for \vocab{selection}
+  \end{enumerate}
+  %
+  \begin{onlyenv}<3-5>
+    \setlength{\abovedisplayskip}{0pt}%
+    \setlength{\belowdisplayskip}{0pt}%
+    \structure{Soundness}\\
+    For arbitrary functions $\varphi : \alert<4>{\TConsW[]}\Val \to \alert<4>{\TConsW[]}\ValY$ and $\psi : \alert<4>{\TConsU[]}\Val \to \alert<4>{\TConsU[]}\ValY$, say
+    \begin{itemize}
+      \item $\varphi$ and $\psi$ are \vocab{sound} at $\cE \in \cS$ iff $\alert<4>{\wsel}\ \cE \comp \varphi = \psi \comp \alert<4>{\wsel}\ \cE$, i.e., TFDC:
+      $$
+        \begin{tikzcd}
+          \alert<5>{\TConsW[]}\Val \ar[d, "\alert<5>{\wsel}\ \cE"'] \ar[r, "\varphi"] \ar[dr, dashed] &
+          \alert<5>{\TConsW[]}\ValY \ar[d, "\alert<5>{\wsel}\ \cE"] \\
+          \alert<5>{\TConsU[]}\Val \ar[r, "\psi"'] & \alert<5>{\TConsW[]}\ValY
+        \end{tikzcd}
+      $$
+      \item $\varphi$ and $\psi$ are \vocab{sound} iff they are sound at every $\cE \in \cS$
+    \end{itemize}
+  \end{onlyenv}
+\end{frame}
+
+% back matter
+\section*{Questions}
+
+\begin{frame}[c]
+  \frametitle{Questions}
+  %
+  \Large\bfseries\centering Thank you!
+  \note[item]<1>{\TODO{question about proof one rule from another} circular logic}
+  \note[item]<1>{\TODO{question about even size Boolean algebra} elements must obey Boolean algebra laws}
+\end{frame}
+
+\section*{References}
+
+\begin{frame}
+  \frametitle{References}
+  %
+  \begin{thebibliography}{Whitehead}
+    \bibitem[Ayoub]{ayoub80}
+      Raymond Ayoub,
+      \emph{Paolo Ruffini's Contributions to the Quintic}.
+      Archive for History of Exact Sciences,
+      vol.~23, no.~3, pp.~253--277, 1980.
+    
+    \bibitem[Descartes]{descartes}
+      Ren{\'e} Descartes,
+      \emph{{A Discourse on the Method}},
+      translated by Ian Maclean.
+      Oxford University Press, Oxford, 2006.
+
+    \bibitem[Euler]{euler}
+      Leonhard Euler,
+      \emph{{Elements of Algebra}},
+      translated by Rev.~John Hewlett.
+      Springer-Verlag, New York, Berlin, Heidelberg, Tokyo, 1984.
+
+    \bibitem[Whitehead]{whitehead}
+      Alfred Whitehead,
+      \emph{{An Introduction to Mathematics}}.
+      Oxford University Press, Oxford, 1948.
+  \end{thebibliography}
+\end{frame}
+
+\end{document}

@@ -1,0 +1,304 @@
+% Hack to sort Dutch names correctly:
+@preamble{{\newcommand{\SORT}[1]{}}}
+
+% Conferences
+@string{AMAST  = {{Int.\ Conf.\ on Algebraic Methodology and Software Technology}}}
+@string{AOSD   = {{Int.\ Conf.\ on Aspect-Oriented Software Development}}}
+@string{ASE    = {{IEEE Int.\ Conf.\ on Automated Software Engineering}}}
+@string{CHI    = {{ACM SIGCHI Conf.\ on Human Factors in Computing Systems}}}
+@string{ECOOP  = {{European Conf.\ on Object-Oriented Programming}}}
+@string{FOSD   = {{Int.\ Workshop on Feature-Oriented Software Development}}}
+@string{FSE    = {{ACM SIGSOFT Int.\ Symp.\ on the Foundations of Software Engineering}}}
+@string{FM     = {{Int.\ Symp.\ on Formal Methods}}}
+@string{GCSE   = {{Int.\ Conf.\ on Generative and Component-Based Software Engineering}}}
+@string{GPCE   = {{Int.\ Conf.\ on Generative Programming and Component Engineering}}}
+@string{ICFP   = {{ACM SIGPLAN Int.\ Conf.\ on Functional Programming}}}
+@string{ICSE   = {{IEEE Int.\ Conf.\ on Software Engineering}}}
+@string{OOPSLA = {{ACM SIGPLAN Int.\ Conf.\ on Object-Oriented Programming, Systems, Languages, and Applications}}}
+@string{PEPM   = {{ACM SIGPLAN Workshop on Partial Evaluation and Semantics-based Program Manipulation}}}
+@string{PLAS   = {{ACM SIGPLAN Workshop on Programming Languages and Analysis for Security}}}
+@string{PFE    = {{Int.\ Workshop on Software Product-Family Engineering}}}
+@string{POPL   = {{ACM SIGPLAN-SIGACT Symposium on Principles of Programming Languages}}}
+@string{PLDI   = {{ACM SIGPLAN Conf.\ on Programming Language Design and Implementation}}}
+@string{RE     = {{IEEE Int.\ Requirements Engineering Conf.}}}
+@string{SPLC   = {{Int.\ Software Product Line Conf.}}}
+@string{VaMoS  = {{Int.\ Workshop on Variability Modeling of Software-Intensive Systems}}}
+
+% Journals
+@string{AFP   = {{Advanced Functional Programing}}}
+@string{CACM  = {{Comm.\ of the ACM}}}
+@string{JACM  = {{J.\ ACM}}}
+@string{JOT   = {{Journal of Object Technology}}}
+@string{SEN   = {{ACM SIGSOFT Software Engineering Notes}}}
+@string{TOSEM = {{ACM Trans.\ on Software Engineering and Methodology}}}
+@string{TSE   = {{IEEE Trans.\ on Software Engineering}}}
+@string{SCP   = {{Science of Computer Programming}}}
+@string{MSCS  = {{Mathematical Structures in Computer Science}}}
+
+% Series
+@string{LNCS  = {{LNCS}}}
+
+% Publishers
+@string{ACM     = {{ACM Press}}}
+@string{ACM:US  = {{New York}}}
+@string{AW      = {{Addison-Wesley}}}
+@string{AW:Bos  = {{Boston}}}
+@string{AW:Read = {{Reading, MA}}}
+@string{CUP     = {{Cambridge University Press}}}
+@string{CUP:UK  = {{Cambridge, UK}}}
+@string{CUP:US  = {{Cambridge, NY}}}
+@string{IEEE    = {{IEEE Computer Society}}}
+@string{IEEE:DC = {{Washington, DC}}}
+@string{IEEE:CA = {{Los Alamitos, CA}}}
+@string{SP      = {{Springer-Verlang}}}
+@string{SP:EU   = {{Berlin Heidelberg}}}
+@string{SP:US   = {{New York}}}
+@string{EL      = {{Elsevier}}}
+@string{EL:AM   = {{Amsterdam}}}
+
+% Institutions
+@string{SEI:CMU = {{Software Engineering Institute, Carnegie Mellon University}}}
+
+@book{dummitfoote,
+  author    = {Dummit, David S. and Foote, Richard M.},
+  title     = {{Abstract Algebra}},
+  year      = 2004,
+  edition   = {Third},
+  publisher = {John Wiley and Sons},
+}
+
+@book{descartes,
+  title     = {{A Discourse on the Method}},
+  author    = {Descartes, Ren{\'e}},
+  editor    = {translated by Ian Maclean},
+  year      = 2006,
+  publisher = {Oxford University Press},
+  address   = {Oxford},
+}
+
+@book{euler,
+  title     = {{Elements of Algebra}},
+  author    = {Euler, Leonhard},
+  editor    = {translated by Rev.~John Hewlett},
+  year      = 1984,
+  publisher = {Springer-Verlag},
+  address   = {New York, Berlin, Heidelberg, Tokyo},
+}
+
+@book{whitehead,
+  title     = {{An Introduction to Mathematics}},
+  author    = {Whitehead, Alfred North},
+  year      = 1948,
+  publisher = {Oxford University Press},
+  address   = {London, Oxford, New York},
+}
+
+@article{ayoub80,
+  title     = {{Paolo Ruffini's Contributions to the Quintic}},
+  author    = {Ayoub, Raymond G},
+  journal   = {{Archive for History of Exact Sciences}},
+  volume    = 23,
+  number    = 3,
+  year      = 1980,
+  pages     = {253--277},
+  publisher = {Springer},
+}
+
+@book{BC04,
+  title     = {{Interactive Theorem Proving and Program Development: Coq'Art: The Calculus of Inductive Constructions}},
+  author    = {Bertot, Yves and Cast{\'e}ran, Pierre},
+  year      = 2004,
+  publisher = {Springer-Verlag},
+  address   = {New York},
+}
+
+@article{Wad92monad,
+  author    = {{Wadler, Philip}},
+  title     = {{Comprehending monads}},
+  journal   = MSCS,
+  volume    = 2,
+  number    = 4,
+  year      = 1992,
+  pages     = {461--493},
+  publisher = CUP,
+  keywords  = {Monad,Array,State in FP},
+}
+
+@inproceedings{Wad95monad,
+  author    = {Wadler, Philip},
+  title     = {{Monads for Functional Programming}},
+  year      = 1995,
+  booktitle = AFP,
+  series    = {LNCS 925},
+  pages     = {24--52},
+  keywords  = {Monad,Array,State in FP},
+}
+
+@inproceedings{Wad92fp,
+  title        = {{The essence of functional programming}},
+  author       = {Wadler, Philip},
+  booktitle    = POPL,
+  pages        = {1--14},
+  year         = 1992,
+  organization = ACM,
+}
+
+% TypeChef
+@inproceedings{Ken10,
+  author    = {Kenner, Andy and K\"{a}stner, Christian and Haase, Steffen and Leich, Thomas},
+  title     = {{TypeChef: Toward Type Checking \#ifdef Variability in C}},
+  booktitle = FOSD,
+  year      = 2010,
+  pages     = {25--32},
+}
+
+@inproceedings{Kas11,
+  author    = {K\"{a}stner, Christian and Giarrusso, Paolo G. and Rendel, Tillmann and Erdweg, Sebastian and Ostermann, Klaus and Berger, Thorsten},
+  title     = {{Variability-Aware Parsing in the Presence of Lexical Macros and Conditional Compilation}},
+  booktitle = OOPSLA,
+  pages     = {805--824},
+  year      = 2011,
+}
+
+@inproceedings{Kas12fosd,
+  title     = {{Toward Variability-Aware Testing}},
+  author    = {K\"{a}stner, Christian and von Rhein, Alexander and Erdweg, Sebastian and Pusch, Jonas and Apel, Sven and Rendel, Tillmann and Ostermann, Klaus},
+  booktitle = FOSD,
+  pages     = {1--8},
+  year      = 2012,
+}
+
+@article{Kas12,
+ author    = {K\"{a}stner, Christian and Apel, Sven and Th\"{u}m, Thomas and Saake, Gunter},
+ title     = {{Type Checking Annotation-based Product Lines}},
+ journal   = TOSEM,
+ volume    = 21,
+ number    = 3,
+ month     = jul,
+ year      = 2012,
+ pages     = {14:1--14:39},
+ publisher = ACM,
+ address   = ACM:US,
+}
+
+@inproceedings{KOE12,
+  author    = {K\"{a}stner, Christian and Ostermann, Klaus and Erdweg, Sebastian},
+  title     = {{A Variability-Aware Module System}},
+  booktitle = OOPSLA,
+  pages     = {773--792},
+  year      = 2012,
+}
+
+@inproceedings{LKA11,
+  author    = {Liebig, J\"{o}rg and K\"{a}stner, Christian and Apel, Sven},
+  title     = {{Analyzing the Discipline of Preprocessor Annotations in 30 Million Lines of C Code}},
+  booktitle = AOSD,
+  year      = 2011,
+  pages     = {191--202},
+}
+
+@inproceedings{Lie10,
+  author    = {Liebig, J\"{o}rg and Apel, Sven and Lengauer, Christian and K\"{ä}stner, Christian and Schulze, Michael},
+  title     = "{An Analysis of the Variability in Forty Preprocessor-Based Software Product Lines}",
+  booktitle = ICSE,
+  year      = 2010,
+  pages     = {105--114},
+}
+
+@article{KA09,
+  title   = {{Virtual Separation of Concerns---A Second Chance for Preprocessors}},
+  author  = {K\"{a}stner, Christian and Apel, Sven},
+  journal = JOT,
+  volume  = 8,
+  number  = 6,
+  pages   = {59--78},
+  year    = 2009,
+}
+
+@inproceedings{KAK08,
+  author    = {K\"{a}stner, Christian and Apel, Sven and Kuhlemann, Martin},
+  title     = {{Granularity in Software Product Lines}},
+  booktitle = ICSE,
+  pages     = {311--320},
+  year      = 2008,
+}
+
+% CIDE feature model
+@inproceedings{KKB08,
+  author    = {Kim, Chang Hwan Peter and K\"{a}stner, Christian and Batory, Don},
+  title     = {{On the Modularity of Feature Interactions}},
+  booktitle = GPCE,
+  pages     = {19--23},
+  year      = 2008,
+}
+
+% CIDE alternatives
+@mastersthesis{Ros09,
+  author = {Rosenthal, M.},
+  title  = {{Alternative Features in Colored Featherweight Java}},
+  year   = 2009,
+  school = {{University of Passau, Germany}},
+  note   = "{(In German)}",
+}
+
+@inproceedings{AKL08,
+  title     = {{Feature Featherweight Java: A Calculus for Feature-Oriented Programming and Stepwise Refinement}},
+  author    = {Apel, S. and K\"{a}stner, C. and Lengauer, C.},
+  booktitle = GPCE,
+  pages     = {101--112},
+  year      = 2008,
+}
+
+% data-flow analysis
+@inproceedings{Bod13,
+  author    = {Eric Bodden and Mira Mezini and Claus Brabrand and T\'arsis Tol\^edo and M\'arcio Ribeiro and Paulo Borba},
+  title     = {{SPLlift - Statically Analyzing Software Product Lines in Minutes Instead of Years}},
+  booktitle = PLDI,
+  year      = 2013,
+  month     = jun,
+}
+
+% faceted execution
+@inproceedings{austin12,
+  title        = {{Multiple facets for dynamic information flow}},
+  author       = {Austin, Thomas H and Flanagan, Cormac},
+  booktitle    = POPL,
+  volume       = 47,
+  number       = 1,
+  pages        = {165--178},
+  year         = 2012,
+  organization = ACM,
+}
+
+@inproceedings{yang12,
+  title        = {{A language for automatically enforcing privacy policies}},
+  author       = {Yang, Jean and Yessenov, Kuat and Solar-Lezama, Armando},
+  booktitle    = POPL,
+  volume       = 47,
+  number       = 1,
+  pages        = {85--96},
+  year         = 2012,
+  organization = ACM,
+}
+
+@inproceedings{austin13,
+  title        = {{Faceted execution of policy-agnostic programs}},
+  author       = {Austin, Thomas H and Yang, Jean and Flanagan, Cormac and Solar-Lezama, Armando},
+  booktitle    = PLAS,
+  pages        = {15--26},
+  year         = 2013,
+  organization = ACM,
+}
+
+% symbolic execution
+@article{torlak14,
+  title     = {{A lightweight symbolic virtual machine for solver-aided host languages}},
+  author    = {Torlak, Emina and Bodik, Rastislav},
+  journal   = PLDI,
+  volume    = 49,
+  number    = 6,
+  pages     = {530--541},
+  year      = 2014,
+  publisher = ACM,
+}
+

@@ -1,0 +1,20 @@
+% language definition for coq
+
+\lstdefinelanguage{coq}{
+  % case sensitive
+  sensitive=true,
+  % basic keywords
+  morekeywords=[1]{Module,Section,Load,Require,Export,Import,End,Open,Scope,
+    Arguments,Global,Instance,Tactic,Notation,Infix,SearchAbout,Eval,Check,
+    Inductive,Definition,Fixpoint,Ltac,Fact,Example,Theorem,Lemma,Corollary,
+    Fact,Remark,Set,Prop,Type,Proof,Admitted,Abort,Restart,Qed,Defined,forall,
+    match,with,by,let,in,as,end,fun,if,then,else},
+  % tactics
+  morekeywords=[2]{intro,intros,reflexivity,symmetry,transitivity,destruct,
+    inversion,induction,simpl,rewrite,apply,assert,unfold,split,left,right,
+    omega,try,repeat},
+  % comments
+  morecomment=[s]{(*}{*)},
+  % strings
+  morestring=[m]"
+}

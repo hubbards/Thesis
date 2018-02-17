@@ -1,0 +1,31 @@
+\chapter{Formal Verification}
+\label{app:coq}
+
+In this appendix, we list verified proofs written in the language of the Coq proof assistant~\citep{BC04}.
+The properties from \chref{cc} are verified in \appref{f-coq} and \appref{fcc-coq} and the source code is available online.\footnote{\url{https://github.com/hubbards/fcc-coq}}
+The properties from \chref{vp} are verified in \appref{vp-coq} and the source code is also available online.\footnote{\url{https://github.com/hubbards/vp-coq}}
+
+\section{Formulas}
+\label{app:f-coq}
+
+\lstinputlisting{../fcc-coq/Formula.v}
+
+\cleardoublepage
+
+\section{Formula Choice Calculus}
+\label{app:fcc-coq}
+
+\lstinputlisting{../fcc-coq/FCC.v}
+
+\cleardoublepage
+
+\section{Variational Programming}
+\label{app:vp-coq}
+
+For simplicity, we use a non-generic map operation.
+However, this is not a fundamental restriction.
+We could use a generic map operation and the following proofs would not change since the logic does not depend on the list type parameter.
+
+\lstinputlisting{../vp-coq/OList.v}
+
+\cleardoublepage

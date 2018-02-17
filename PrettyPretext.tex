@@ -1,0 +1,111 @@
+% pretty pretext
+
+\newcommand{\emptyline}{\mbox{}\newline}
+\newcommand{\flyleaf}{\thispagestyle{empty}\mbox{}\newpage}
+
+\newcommand{\defensedate}{June 1, 2016}
+\makeatletter
+\newcommand{\mytitle}{\@title}
+\newcommand{\myname}{\@author}
+\makeatother
+
+% pretext
+\frontmatter
+\pagestyle{empty}
+\flyleaf
+
+% abstract
+\begin{center}
+  \headcaps{An Abstract of the Thesis of}
+\end{center}
+
+\emptyline
+\noindent
+\myname\ for the degree of Master of Science in Computer Science presented on \defensedate.
+
+\emptyline
+\noindent
+Title: \mytitle
+
+\emptyline
+\noindent
+Abstract approved: \hrulefill \\
+\phantom{Abstract approved:\ }\hfill Eric T. Walkingshaw
+
+\input{Abstract}
+\clearpage
+
+% copyright
+\vspace*{7\baselineskip}
+\begin{center}
+  \raisebox{2pt}{\textcopyright} Copyright by \myname \\
+  \defensedate \\
+  All Rights Reserved
+\end{center}
+\clearpage
+
+% title page
+\begin{center}
+  {\headfont\mytitle} \\ \emptyline
+  by \\ \emptyline
+  \myname
+
+  \vfill
+  A \textls[100]{THESIS} \\ \emptyline
+  submitted to \\ \emptyline
+  Oregon State University
+
+  \vfill
+  in partial fulfillment of \\
+  the requirements for the \\
+  degree of \\ \emptyline
+  Master of Science
+
+  \vfill
+  Presented \defensedate \\
+  Commencement June 2016
+\end{center}
+\clearpage
+
+% approval
+\newcommand{\Approve}[1]{\vspace{3em}\hrulefill \\ #1}
+
+\begin{flushleft}
+  Master of Science thesis of \myname \\
+  presented on \defensedate.
+
+  \vspace{3em}
+  \textls[100]{APPROVED}:
+
+  \Approve{Major Professor, representing Computer Science}
+
+  \Approve{Director of the School of Electrical Engineering and Computer Science}
+
+  \Approve{Dean of the Graduate School}
+
+  \vfill
+  I understand that my thesis will become part of the permanent collection
+  of Oregon State University libraries. My signature below authorizes release of
+  my thesis to any reader upon request.
+
+  \Approve{\myname, Author}
+\end{flushleft}
+\clearpage
+
+% acknowledgements
+\chapter*{Acknowledgments}
+\pagestyle{plain}
+\input{Acknowledge}
+
+% contributions
+%\chapter*{Contribution of Authors}
+%\input{Contribution}
+
+% listings
+\tableofcontents
+\clearpage
+
+\listoffigures
+\clearpage
+
+\pagestyle{myheadings}

@@ -1,0 +1,38 @@
+\chapter{Introduction}
+\label{ch:intro}
+
+In this thesis, we present semantic equivalence rules for an extension of the choice calculus and sound operations for an implementation of variational lists.
+The choice calculus is a calculus for describing variation and the formula choice calculus is an extension with formulas.
+We prove semantic equivalence rules for the formula choice calculus.
+Variational lists are functional data structures for representing and computing with variation in lists using the choice calculus.
+We prove map and bind operations are sound for an implementation of variational lists.
+These proofs are written and verified in the language of the Coq proof assistant.
+
+The choice calculus is a metalanguage for describing variation in an arbitrary object language~\citep{EW11tosem}.
+The formula choice calculus is an extension of the choice calculus where choices are labeled with formulas instead of dimensions~\citep{WO14gpce}.
+Semantic equivalence rules for the choice calculus have been established by previous work~\citep{Walk13thesis}.
+In \chref{cc}, we establish similar semantic equivalence rules for the formula choice calculus.
+
+Previous work has used the formula choice calculus without proving semantic equivalence rules.
+For example, a projectional editing model of variational software is based on formula choice calculus and some semantic equivalence rules have been stated---without proof---for this projectional editing model~\citep{WO14gpce}.
+As another example, TypeChef is a tool for parsing and type checking C code with preprocessor directives and is based on a model similar to the formula choice calculus~\citep{Ken10,Kas11,Walk14onward}.
+We provide a formal foundation for previous and future work that use the formula choice calculus.
+
+Variational lists are functional data structures for representing and computing with variation in lists using the choice calculus~\citep{WE12gpce}.
+Option-lists are an implementation of variational lists as lists of variational optional values~\citep{Walk14onward}.
+%A (covariant) endofunctor on the category of types is a type constructor together with a map operation which satisfies certain properties.
+%A monad on the category of types is a type constructor together with some bind and unit operations which satisfy certain properties.
+In \chref{vp}, we establish sound map\footnote{The map operation is part of the definition of a functor.} and bind\footnote{The bind operation is part of the definition of a monad.} operations for option-lists.
+We also provide a general definition of soundness for operations on variational data structures.
+
+Variational lists are common variational data structures that arise naturally in many variational programming problems.
+For example, SPLlift is a tool for inter-procedural data-flow analysis on software product lines that uses variational graphs~\citep{Bod13}.
+A variational list could be used for an adjacency list representation of a variational graph~\citep{Walk14onward}.
+As another example, the CIDE tool~\citep{KAK08} and Color Featherweight Java~\citep{Kas12} use data structures which are similar to---but less expressive than---option-lists~\citep{Walk14onward}.
+Previous work has identified a need for foundational research on variational data structures~\citep{Walk14onward}.
+We provide a formal foundation for option-lists.
+We also demonstrate a general and principled technique for establishing soundness for operations on variational data structures.
+
+In \appref{coq}, we provide verified proofs written in the language of the Coq proof assistant~\citep{BC04}.
+The properties from \chref{cc} are verified in \appref{f-coq} and \appref{fcc-coq} and the source code is available online.\footnote{\url{https://github.com/hubbards/fcc-coq}}
+The properties from \chref{vp} are verified in \appref{vp-coq} and the source code is also available online.\footnote{\url{https://github.com/hubbards/vp-coq}}

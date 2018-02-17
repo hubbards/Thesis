@@ -1,0 +1,162 @@
+% main file for thesis
+
+% preamble
+
+% To compile the pretty version of the thesis:
+% 1. Uncomment the two lines after this comment.
+% 2. Comment out the stuff corresponding to the ugly version.
+%
+\documentclass[12pt,oneside]{book}
+\usepackage{ThesisPretty}
+
+% To compile the version for the grad school (ugly):
+% 1. Uncomment the two lines after this comment.
+% 2. Comment out the stuff corresponding to the pretty version.
+%
+%\documentclass[12pt,oneside]{book}
+%\usepackage{ThesisUgly}
+
+% package imports
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[expansion,protrusion]{microtype}
+\usepackage[osf,sc]{mathpazo}
+\usepackage[scaled=0.8]{beramono}
+\usepackage{amsmath,amssymb,latexsym,stmaryrd}
+\usepackage{eufrak,eucal}
+\usepackage{geometry}
+%\usepackage{layout}
+%\usepackage{array}
+\usepackage{setspace}
+\usepackage{enumerate}
+\usepackage{paralist}
+\usepackage{amsthm}
+\usepackage{mathpartir}
+% TODO: add htb to figures and remove float package
+\usepackage{float}
+%\usepackage[flushmargin]{footmisc}
+\usepackage{natbib}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage[linktocpage=true]{hyperref} % hidelinks
+\usepackage[final]{listings}
+\usepackage{tikz-cd}
+\usepackage{lambda,cc}
+
+% formatting
+\onehalfspacing
+\widowpenalty=10000
+\clubpenalty=10000
+
+% overlap macros for mathmode
+\def\clap#1{\hbox to 0pt{\hss#1\hss}}
+\def\mathllap{\mathpalette\mathllapinternal}
+\def\mathrlap{\mathpalette\mathrlapinternal}
+\def\mathclap{\mathpalette\mathclapinternal}
+\def\mathllapinternal#1#2{\llap{$\mathsurround=0pt#1{#2}$}}
+\def\mathrlapinternal#1#2{\rlap{$\mathsurround=0pt#1{#2}$}}
+\def\mathclapinternal#1#2{\clap{$\mathsurround=0pt#1{#2}$}}
+
+% math operators
+\DeclareMathOperator{\Forall}{\forall}
+\DeclareMathOperator{\Exists}{\exists}
+\DeclareMathOperator{\Not}{\lnot}
+
+% theorems
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+
+% customize qed symbol
+\renewcommand\qedsymbol{\ensuremath{\blacksquare}}
+
+% references and citations
+\input{natbib-both}
+%\input{natbib-year}
+\newcommand{\tabref}[1]{\hyperref[tab:#1]{Table~\ref*{tab:#1}}}
+\newcommand{\figref}[1]{\hyperref[fig:#1]{Figure~\ref*{fig:#1}}}
+\newcommand{\secref}[1]{\hyperref[sec:#1]{Section~\ref*{sec:#1}}}
+\newcommand{\appref}[1]{\hyperref[app:#1]{Appendix~\ref*{app:#1}}}
+\newcommand{\chref}[1]{\hyperref[ch:#1]{Chapter~\ref*{ch:#1}}}
+\newcommand{\thmref}[1]{\hyperref[thm:#1]{Theorem~\ref*{thm:#1}}}
+\newcommand{\lemref}[1]{\hyperref[lem:#1]{Lemma~\ref*{lem:#1}}}
+\newcommand{\exref}[1]{\hyperref[ex:#1]{Example~\ref*{ex:#1}}}
+
+% hyperref settings
+\hypersetup{
+  colorlinks=true,
+  citecolor=RoyalBlue,
+  linkcolor=RoyalBlue,
+  urlcolor=RoyalBlue
+}
+
+% language settings for coq
+\input{coq}
+
+% lstlisting settings
+\lstset{
+  language=coq,
+  tabsize=2,
+  %sensitive=true,
+  extendedchars=false,
+  showstringspaces=false,
+  basicstyle=\ttfamily\footnotesize\color{black},
+  %identifierstyle={},
+  %keywordstyle=[1]{},
+  %keywordstyle=[2]{},
+  commentstyle={\itshape},
+  %stringstyle={},
+}
+
+% commutative diagrams
+\tikzcdset{row sep/normal=4em,column sep/normal=4em}
+
+% customize inference rules
+\renewcommand{\rn}[1]{\hbox{\small\textsc{#1}}}
+\renewcommand{\DefTirName}[1]{\raisebox{.3ex}{\rn{#1}}}
+\def\MathparLineskip{\lineskiplimit=1.2em\lineskip=1.8em plus 0.2em}
+
+% customize colors / formatting
+\renewcommand{\OB}[1]{\ensuremath{\color{black}#1}}
+\renewcommand{\CCkeyw}[1]{\OB{\mathbf{#1}}}
+\renewcommand{\CCname}[1]{\OB{\textit{#1}}}
+% vocabulary word / definition
+\newcommand*{\vocab}[1]{\emph{#1}}
+
+% rule and language names
+\input{names}
+
+% hyphenation
+\hyphenation{me-ta-pro-gram-ming}
+\hyphenation{me-ta-var-i-a-ble}
+\hyphenation{e-quiv-a-lence}
+
+\title{A Formal Foundation for Variational Programming Using the Choice Calculus}
+%\title{Formula Choices and Variational Lists: A Formal Foundation for Variational Programming}
+\author{Spencer Hubbard}
+%\date{\today}
+
+\begin{document}
+% front matter
+\iftoggle{Pretty}
+  {\include{PrettyPretext}}
+  {\include{UglyPretext}}
+%\include{Dedication}
+
+% main matter
+\mainmatter
+\input{Introduction}
+\input{FormulaChoiceCalculus}
+\input{VariationalProgramming}
+\input{Conclusion}
+\cleardoublepage
+
+% back matter
+\appendix
+\input{Appendix}
+%\nocite{*}
+\bibliographystyle{abbrvnat} % abbrv, abbrvnat
+\bibliography{eric,other}
+\end{document}

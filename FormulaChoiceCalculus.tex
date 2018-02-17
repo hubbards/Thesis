@@ -1,0 +1,943 @@
+\chapter{Formula Choice Calculus}
+\label{ch:cc}
+
+In this chapter, we establish semantic equivalence rules for the formula choice calculus.
+The choice calculus is a metalanguage for describing variation in an arbitrary object language~\citep{EW11tosem}.
+The formula choice calculus is an extension of the choice calculus where choices are labeled with formulas instead of dimensions~\citep{WO14gpce}.
+The choice calculus is described in \secref{ccback}, formulas are described in \secref{f}, the formula choice calculus is described in \secref{fcc}, and a generalization is discussed in \secref{ccgen}.
+
+\section{Choice Calculus}
+\label{sec:ccback}
+
+% customize metavariable for options
+\renewcommand*{\dimMeta}{\dE}
+
+Consider an object language \objS\ with abstract syntax described by the grammar in \figref{obj}.
+Atoms represent symbols in the object language and have no internal structure.
+The tree construct is binary for simplicity.
+However, the syntax supports encoding of constructs with arbitrary arity, e.g., with right nested trees.
+
+\begin{figure}[H]
+  \onehalfspacing
+  \begin{syntax}
+    \aE \in \aS &&& \textit{Atom} \\
+    \objE \in \objS
+    & ::= & \objEmpty & \textit{Empty} \\
+    & | & \tr{\objE, \objE} & \textit{Tree}
+  \end{syntax}
+  \caption{Object language syntax.}
+  \label{fig:obj}
+\end{figure}
+
+The choice calculus is instantiated with the object language \objS.
+The abstract syntax of choice calculus expressions is described by the grammar in \figref{ccsyn}.
+The expressions in the choice construct are called \vocab{alternatives} and the dimension is called a \vocab{label}.
+
+\begin{figure}[H]
+  \onehalfspacing
+  \begin{syntax}
+    \dE \in \dS &&& \textit{Dimension} \\
+    \ccE \in \ccS
+    & ::= & \objEmpty & \textit{Empty} \\
+    & | & \tr{\ccE, \ccE} & \textit{Tree} \\
+    & | & \chc{\ccE, \ccE} & \textit{Choice}
+  \end{syntax}
+  \caption{Choice calculus syntax.}
+  \label{fig:ccsyn}
+\end{figure}
+
+A \vocab{tag} is either the \vocab{left tag} \tagL\ or the \vocab{right tag} \tagR\ and a \vocab{configuration} is a (total) function from dimensions to tags.
+Note that a function is total (or everywhere defined) by the mathematically accepted definition of a function and so we omit this hereafter.
+The set of tags is $\tagS = \set{\tagL, \tagR}$ and the set of configurations is $\cS = \dS \to \tagS$.
+The metavariables \tagE\ and \cE\ are used to represent arbitrary tags and configurations, respectively, unless qualified otherwise.
+
+The semantic domain for expressions is the function domain $\cS \to \objS$, which is the set of functions from configurations to elements of the object language.
+The semantic function for expressions is \ccSem{\cdot}, which is defined by the equations in \figref{ccsem}.
+Note that we use juxtaposition to indicate function application, as in lambda calculus, e.g., we write $\cE\ \dE$ to indicate application of configuration \cE\ to dimension \dE.
+In the last equation, note that if $\cE\ \dE \ne \tagL$, then $\cE\ \dE = \tagR$.
+Elements of the object language in the image of \ccSem{\ccE} are called \vocab{variants} of \ccE\ and application of \ccSem{\ccE} is called \vocab{selection}.
+
+\begin{figure}[H]
+  \onehalfspacing
+  \begin{alignat*}{2}
+    \mathrlap{\ccSem{\cdot} : \ccS \to \cS \to \objS} \\
+    &\ccSem[\cE]{\objEmpty} &&= \objEmpty \\
+    &\ccSem[\cE]{\tr{\ccE_1, \ccE_2}} &&=
+    \tr{\ccSem[\cE]{\ccE_1}, \ccSem[\cE]{\ccE_2}} \\
+    &\ccSem[\cE]{\chc{\ccE_1, \ccE_2}} &&=
+    \begin{cases}
+      \ccSem[\cE]{\ccE_1}, & \text{if }\cE\ \dE = \tagL \\
+      \ccSem[\cE]{\ccE_2}, & \text{otherwise}%(\cE\ \dE = \tagR)
+    \end{cases}
+  \end{alignat*}
+  \caption{Choice calculus semantics.}
+  \label{fig:ccsem}
+\end{figure}
+
+For example, consider the choice calculus instantiated with the object language of decimal notation.
+Atoms of this object language are Arabic numerals, e.g., the Arabic numerals $1$, $2$, and $3$ are atoms.
+Terms of this object language are right nested branches.
+For convenience, we write the concrete syntax of terms as sequences of Arabic numerals, e.g., $123$ and $213$ are terms in the concrete syntax which correspond to the terms \tr[1]{\objEmpty, \tr[2]{\objEmpty, \tr[3]{\objEmpty, \objEmpty}}} and \tr[2]{\objEmpty, \tr[1]{\objEmpty, \tr[3]{\objEmpty, \objEmpty}}}, respectively, in the abstract syntax.
+Suppose \dE\ is a dimension.
+Then $\chc{12,21}3$ is a choice calculus expression.
+This expression consists of a sequence with a choice followed by the term $3$.
+The choice is labeled with the dimension \dE\ and the alternatives are the terms $12$ and $21$.
+Moreover, for each configuration \cE, the semantics of this expression is the following:
+%
+\begin{inparaenum}[(1)]
+  \item if $\cE\ \dE = \tagL$, then the variant $123$ is selected, and
+  \item if $\cE\ \dE = \tagR$, then the variant $213$ is selected.
+\end{inparaenum}
+
+Choices can be extended to support more alternatives.
+One way to do this is by adding tags to the set of tags and corresponding cases to the semantics of choices.
+In this way, the number of alternatives is equal to the number of tags.
+For example, to support three alternatives we add a third tag to the set of tags, extend the syntax of choices with a third alternative, and the semantics of choices with a third case.
+
+\section{Formulas}
+\label{sec:f}
+
+In this section we present formulas in tags and dimensions.
+We describe the syntax and semantics of formulas in \secref{fsem} and establish rules for deriving formula equivalence in \secref{feq}.
+
+\subsection{Denotational Semantics}
+\label{sec:fsem}
+
+We begin with a ``semantics first''~\citep{EW11sle} description of formulas in tags.
+The set \tagS\ forms an algebra with prefix unary operator ($\Not$), called \vocab{complement}, and infix binary operators ($\lor$) and ($\land$), called \vocab{join} and \vocab{meet}, respectively.
+These operators are defined by the tables in \figref{tag}.
+Note that \tagS\ is the Boolean algebra with two elements---up to isomorphism---where \tagL\ is ``true'' and \tagR\ is ``false.''
+
+\begin{figure}[H]
+  \onehalfspacing
+  $$
+    \begin{array}{c|c}
+      \tagE & \Not \tagE \\
+      \hline
+      \tagL & \tagR \\
+      \tagR & \tagL \\
+    \end{array}
+    \qquad
+    \begin{array}{c|cc}
+      \lor & \tagL & \tagR \\
+      \hline
+      \tagL & \tagL & \tagL \\
+      \tagR & \tagL & \tagR \\
+    \end{array}
+    \qquad
+    \begin{array}{c|cc}
+      \land & \tagL & \tagR \\
+      \hline
+      \tagL & \tagL & \tagR \\
+      \tagR & \tagR & \tagR \\
+    \end{array}
+  $$
+  \caption{Boolean algebra on tags.}
+  \label{fig:tag}
+\end{figure}
+
+The abstract syntax of formulas is described by the grammar in \figref{fsyn}.
+Note that we reuse the symbols for the operators defined in the previous paragraph.
+The semantic domain for formulas is the function domain $\cS \to \tagS$, which is the set of functions from configurations to tags.
+The semantic function for formulas is \fSem{\cdot}, which is defined by the equations in \figref{fsem}.
+
+\begin{figure}[H]
+  \onehalfspacing
+  \begin{syntax}
+    \fE \in \fS
+    & ::= & \tagE & \textit{Tag} \\
+    & | & \dE & \textit{Dimension} \\
+    & | & \Not \fE & \textit{Complement} \\
+    & | & \fE \lor \fE & \textit{Join} \\
+    & | & \fE \land \fE & \textit{Meet}
+  \end{syntax}
+  \caption{Formula syntax.}
+  \label{fig:fsyn}
+\end{figure}
+
+\begin{figure}[H]
+  \onehalfspacing
+  \begin{alignat*}{2}
+    &\mathrlap{\fSem{\cdot} : \fS \to \cS \to \tagS} \\
+    &\fSem[\cE]{\tagE} &&= \tagE \\
+    &\fSem[\cE]{\dE} &&= \cE\ \dE \\
+    &\fSem[\cE]{\Not \fE} &&= \Not \fSem[\cE]{\fE} \\
+    &\fSem[\cE]{\fE_1 \lor \fE_2} &&=
+    \fSem[\cE]{\fE_1} \lor \fSem[\cE]{\fE_2} \\
+    &\fSem[\cE]{\fE_1 \land \fE_2} &&=
+    \fSem[\cE]{\fE_1} \land \fSem[\cE]{\fE_2}
+  \end{alignat*}
+  \caption{Formula semantics.}
+  \label{fig:fsem}
+\end{figure}
+
+\subsection{Semantic Equivalence}
+\label{sec:feq}
+
+Before we define semantic equivalence, it is useful to recall the following elementary facts:
+%
+\begin{inparaenum}[(1)]
+  \item Two functions are equal, by definition, if they have the same domain and codomain and their images agree for all elements in the domain.
+  \item For any function, the inverse images of elements in the codomain partition the domain.
+  \item Any partition defines a ``canonical'' equivalence relation where the parts of the partition correspond to the equivalence classes of the relation.
+\end{inparaenum}
+
+Let ($\equiv$) be a binary relation on formulas defined by $\fE \equiv \fE'$ if and only if $\fSem{\fE} = \fSem{\fE'}$.
+Note that the relation ($\equiv$) is defined in terms of function equality.
+Since \fSem{\cdot} is well-defined as a function from formulas to elements of the semantic domain, it follows from earlier remarks that the relation ($\equiv$) is an equivalence relation.
+We refer to the relation ($\equiv$) as \vocab{semantic equivalence} and we call formulas \fE\ and $\fE'$ (\vocab{semantically}) \vocab{equivalent} if $\fE \equiv \fE'$.
+
+In the remainder of this section, we establish some syntactic rules for deriving formula equivalence.
+In practice, formula equivalence can be checked by solving an instance of the satisfiability problem, e.g., using a SAT solver, and this is justified by the syntactic rules.
+%The rules are organized into three sets:
+%\begin{inparaenum}[(1)]
+%  \item formula equivalence rules,
+%  \item formula congruence rules, and
+%  \item algebraic rules.
+%\end{inparaenum}
+We prove these rules are correct in \appref{f-coq}.
+%However, we do not prove these rules are complete, i.e., if $\fE \equiv \fE'$, then there is a derivation by the syntactic rules.
+%The rules are expected to be complete because they cover every possible pairwise interaction between constructs in the syntax.
+%Proving the completeness of a minimal set of rules is left to future work.
+
+The formula equivalence rules are stated in \figref{fequiv}.
+These rules state that formulas equivalence is reflexive, symmetric, and transitive.
+These rules follow directly from the definition of an equivalence relation.
+
+\begin{figure}[H]
+  \onehalfspacing
+  \begin{mathpar}
+    \inferrule[\rReflE]
+      {}
+      { \fE \equiv \fE }
+    
+    \inferrule[\rSymmE]
+      { \fE \equiv \fE' }
+      { \fE' \equiv \fE }
+    
+    \inferrule[\rTranE]
+      { \fE_1 \equiv \fE_2 \\
+        \fE_2 \equiv \fE_3 }
+      { \fE_1 \equiv \fE_3 }
+  \end{mathpar}
+  \caption{Formula equivalence rules.}
+  \label{fig:fequiv}
+\end{figure}
+
+The formula congruence rules are stated in \figref{fcong}.
+Note that the formula congruence rules are not independent of each other, e.g., \rJoinCong\ can be derived from \rJoinCongL\ and \rJoinCongR.
+
+\begin{figure}[H]
+  \onehalfspacing
+  \begin{mathpar}
+    \inferrule[\rCompCong]
+      { \fE \equiv \fE' }
+      { \Not\fE \equiv \Not\fE' }
+
+    \inferrule[\rJoinCong]
+      { \fE_1 \equiv \fE_1' \\
+        \fE_2 \equiv \fE_2' }
+      { \fE_1 \lor \fE_2
+        \equiv
+        \fE_1' \lor \fE_2' }
+
+    \inferrule[\rJoinCongL]
+      { \fE_1 \equiv \fE_1' }
+      { \fE_1 \lor \fE_2
+        \equiv
+        \fE_1' \lor \fE_2 }
+
+    \inferrule[\rJoinCongR]
+      { \fE_2 \equiv \fE_2' }
+      { \fE_1 \lor \fE_2
+        \equiv
+        \fE_1 \lor \fE_2' } \\
+
+    \inferrule[\rMeetCong]
+      { \fE_1 \equiv \fE_1' \\
+        \fE_2 \equiv \fE_2' }
+      { \fE_1 \land \fE_2
+        \equiv
+        \fE_1' \land \fE_2' }
+
+    \inferrule[\rMeetCongL]
+      { \fE_1 \equiv \fE_1' }
+      { \fE_1 \land \fE_2
+        \equiv
+        \fE_1' \land \fE_2 }
+
+    \inferrule[\rMeetCongR]
+      { \fE_2 \equiv \fE_2' }
+      { \fE_1 \land \fE_2
+        \equiv
+        \fE_1 \land \fE_2' }
+  \end{mathpar}
+  \caption{Formula congruence rules.}
+  \label{fig:fcong}
+\end{figure}
+
+The algebraic rules are stated in \figref{alg}.
+These are the usual rules of Boolean algebra expressed for formula equivalence.
+
+\begin{figure}[H]
+  \onehalfspacing
+  \begin{mathpar}
+    \inferrule[\rJoinComp]
+      {}
+      { \fE \lor \Not \fE \equiv \tagL }
+
+    \inferrule[\rMeetComp]
+      {}
+      {\fE \land \Not \fE \equiv \tagR }
+
+    \inferrule[\rJoinId]
+      {}
+      { \tagR \lor \fE \equiv \fE }
+
+    \inferrule[\rMeetId]
+      {}
+      { \tagL \land \fE \equiv \fE } \\
+
+    \inferrule[\rJoinIdemp]
+      {}
+      { \fE \lor \fE \equiv \fE }
+
+    \inferrule[\rMeetIdemp]
+      {}
+      { \fE \land \fE \equiv \fE }
+
+    \inferrule[\rJoinComm]
+      {}
+      { \fE_1 \lor \fE_2
+        \equiv
+        \fE_2 \lor \fE_1 }
+
+    \inferrule[\rMeetComm]
+      {}
+      { \fE_1 \land \fE_2
+        \equiv
+        \fE_2 \land \fE_1 }
+
+    \inferrule[\rJoinAssoc]
+      {}
+      { \fE_1 \lor (\fE_2 \lor \fE_3)
+        \equiv
+        (\fE_1 \lor \fE_2) \lor \fE_3 }
+
+    \inferrule[\rMeetAssoc]
+      {}
+      { \fE_1 \land (\fE_2 \land \fE_3)
+        \equiv
+        (\fE_1 \land \fE_2) \land \fE_3 }
+
+    \inferrule[\rJoinDist]
+      {}
+      { \fE_1 \lor (\fE_2 \land \fE_3)
+        \equiv
+        (\fE_1 \lor \fE_2) \land (\fE_1 \lor \fE_3) }
+
+    \inferrule[\rMeetDist]
+      {}
+      { \fE_1 \land (\fE_2 \lor \fE_3)
+        \equiv
+        (\fE_1 \land \fE_2) \lor (\fE_1 \land \fE_3) }
+
+    \inferrule[\rCompJoin]
+      {}
+      { \Not(\fE_1 \lor \fE_2)
+        \equiv
+        \Not \fE_1 \land \Not \fE_2 }
+
+    \inferrule[\rCompMeet]
+      {}
+      { \Not(\fE_1 \land \fE_2)
+        \equiv
+        \Not \fE_1 \lor \Not \fE_2 }
+  \end{mathpar}
+  \caption{Algebraic rules.}
+  \label{fig:alg}
+\end{figure}
+
+Note that the formula congruence and algebraic rules imply that the set of equivalence classes of formulas is isomorphic to the free Boolean algebra on the set of dimensions \dS.
+The operations on equivalence classes are defined in terms of the operations on representative formulas and the formula congruence rules ensure that these operations are well-defined.
+
+As an aside, consider the binary infix operator ($\vartriangle$) on the set of equivalence classes, called \vocab{symmetric difference} (or \vocab{exclusive or}).
+For any representative formulas $\fE_1, \fE_2 \in \fS$, the symmetric difference $\fE_1 \vartriangle \fE_2$ is defined to be the equivalence class with representative formula $(\fE_1 \land \Not \fE_2) \lor (\fE_2 \land \Not \fE_1)$.
+Note that the equivalence classes form a group with law of composition given by symmetric difference.
+We revisit this idea in \secref{ccgen}.
+
+\section{Formula Choice Calculus}
+\label{sec:fcc}
+
+% customize metavariable for formula choices
+\renewcommand*{\dimMeta}{\fE}
+
+In this section we present the formula choice calculus.
+We describe the syntax and semantics of expressions in \secref{fccsem} and establish rules for deriving expression equivalence in \secref{fcceq}.
+
+\subsection{Denotational Semantics}
+\label{sec:fccsem}
+
+The abstract syntax of expressions is described by the grammar in \figref{fccsyn}.
+The semantic domain for expressions is the function domain $\cS \to \objS$, which is the set of functions from configurations to elements of the object language.
+The semantic function for expressions is \ccSem{\cdot}, which is defined by the equations in \figref{fccsem}.
+In the last equation, note that if $\fSem[\cE]{\fE} \ne \tagL$, then $\fSem[\cE]{\fE} = \tagR$.
+
+\begin{figure}[H]
+  \onehalfspacing
+  \begin{syntax}
+    \ccE \in \ccS
+    & ::= & \objEmpty & \textit{Empty} \\
+    & | & \tr{\ccE, \ccE} & \textit{Tree} \\
+    & | & \chc{\ccE, \ccE} & \textit{Choice}
+  \end{syntax}
+  \caption{Formula choice calculus syntax.}
+  \label{fig:fccsyn}
+\end{figure}
+
+\begin{figure}[H]
+  \onehalfspacing
+  \begin{alignat*}{2}
+    &\mathrlap{\ccSem{\cdot} : \ccS \to \cS \to \objS} \\
+    &\ccSem[\cE]{\objEmpty} &&= \objEmpty \\
+    &\ccSem[\cE]{\tr{\ccE_1, \ccE_2}} &&=
+    \tr{\ccSem[\cE]{\ccE_1}, \ccSem[\cE]{\ccE_2}} \\
+    &\ccSem[\cE]{\chc{\ccE_1, \ccE_2}} &&=
+    \begin{cases}
+      \ccSem[\cE]{\ccE_1}, & \text{if }\fSem[\cE]{\fE} = \tagL \\
+      \ccSem[\cE]{\ccE_2}, & \text{otherwise}%(\fSem[\cE]{\fE} = \tagR)
+    \end{cases}
+  \end{alignat*}
+  \caption{Formula choice calculus semantics.}
+  \label{fig:fccsem}
+\end{figure}
+
+For example, consider the formula choice calculus instantiated with the same object language as before, i.e., the object language of decimal notation.
+Suppose $\dE_1$ and $\dE_2$ are dimensions.
+Then $\chc[(\dE_1 \lor \dE_2)]{12,21}3$ is a formula choice calculus expression.
+This expression consists of a similar sequence as before, except the choice is labeled with the formula $\dE_1 \lor \dE_2$.
+Moreover, for each configuration \cE, the semantics of this expression is the following:
+%
+\begin{inparaenum}[(1)]
+  \item if $\cE\ \dE_1 = \tagL$ or $\cE\ \dE_2 = \tagL$, then the variant $123$ is selected, and
+  \item if $\cE\ \dE_1 = \tagR$ and $\cE\ \dE_2 = \tagR$, then the variant $213$ is selected.
+\end{inparaenum}
+
+\subsection{Semantic Equivalence}
+\label{sec:fcceq}
+
+Semantic equivalence for expressions is defined in the same way as it is for formulas.
+Let ($\equiv$) be a binary relation on expressions defined by $\ccE \equiv \ccE'$ if and only if $\ccSem{\ccE} = \ccSem{\ccE'}$.
+By the same reasoning as before, the relation ($\equiv$) is an equivalence relation.
+We refer to the relation ($\equiv$) as \vocab{semantic equivalence} and we call expressions \ccE\ and $\ccE'$ (\vocab{semantically}) \vocab{equivalent} if $\ccE \equiv \ccE'$.
+
+In the remainder of this section, we establish some syntactic rules for deriving expression equivalence.
+We prove these rules are correct in \appref{fcc-coq}.
+However, we do not prove these rules are complete, i.e., if $\ccE \equiv \ccE'$, then there is a derivation by these rules.
+Proving the completeness of a minimal set of rules is left to future work.
+
+All of the rules stated in this section can be proved directly from the definition of expression equivalence.
+However, this often leads to duplication of logic among the proofs.
+Moreover, these proofs are not very insightful.
+To avoid duplication and to describe relationships among rules, we derive some rules from others---rather than directly from definitions.
+
+The expression equivalence rules are stated in \figref{eequiv}.
+These rules state that expression equivalence is reflexive, symmetric, and transitive.
+These rules follow directly from the definition of an equivalence relation.
+
+\begin{figure}[H]
+  \onehalfspacing
+  \begin{mathpar}
+  \inferrule[\rReflE]
+    {}
+    { \ccE \equiv \ccE }
+  
+  \inferrule[\rSymmE]
+    { \ccE \equiv \ccE' }
+    { \ccE' \equiv \ccE }
+  
+  \inferrule[\rTranE]
+    { \ccE_1 \equiv \ccE_2 \\
+      \ccE_2 \equiv \ccE_3 }
+    { \ccE_1 \equiv \ccE_3 }
+  \end{mathpar}
+  \caption{Expression equivalence rules.}
+  \label{fig:eequiv}
+\end{figure}
+
+The choice transposition rule is stated in \figref{ctrans}.
+This rule states that the semantics of a choice is invariant under transposition of its alternatives and complementation of its label.
+%This rule describes the relationship between formulas and choices.
+This rule allows us to derive some rules from others and it is used extensively in these derivations.
+We often omit details of applying this rule for brevity.
+We prove this rule directly from the definition of expression equivalence, see \appref{fcc-coq}.
+
+\begin{figure}[H]
+  \onehalfspacing
+  \begin{mathpar}
+    \inferrule[\rCTrans]
+      {}
+      { \chc{\ccE_1, \ccE_2}
+        \equiv
+        \chc[\Not \fE]{\ccE_2, \ccE_1} }
+  \end{mathpar}
+  \caption{Choice transposition rule.}
+  \label{fig:ctrans}
+\end{figure}
+
+The object congruence rules are stated in \figref{ocong}.
+Note that these rules are not independent of each other.
+For example, \rOCong\ can be derived from the other two rules.
+These rules do not refer to formula choices directly and so they do not differ from the corresponding rules for dimension choices in a meaningful way.
+For completeness, we include proofs of these rules in \appref{fcc-coq}.
+
+\begin{figure}[H]
+  \onehalfspacing
+  \begin{mathpar}
+    \inferrule[\rOCong]
+      { \ccE_1 \equiv \ccE_1' \\
+        \ccE_2 \equiv \ccE_2' }
+      { \tr{\ccE_1, \ccE_2}
+        \equiv
+        \tr{\ccE_1', \ccE_2'} }
+
+    \inferrule[\rOCongL]
+      { \ccE_1 \equiv \ccE_1' }
+      { \tr{\ccE_1, \ccE_2}
+        \equiv
+        \tr{\ccE_1', \ccE_2} }
+
+    \inferrule[\rOCongR]
+      { \ccE_2 \equiv \ccE_2' }
+      { \tr{\ccE_1, \ccE_2}
+        \equiv
+        \tr{\ccE_1, \ccE_2'} }
+  \end{mathpar}
+  \caption{Object congruence rules.}
+  \label{fig:ocong}
+\end{figure}
+
+The choice congruence rules are stated in \figref{ccong}.
+Note that these rules are not independent of each other.
+For example, we show \rCCong\ directly from the other three rules in the proof of \thmref{ccong}.
+Of course, we could also derive the other three rules directly from \rCCong.
+The choice congruence rule for labels \rCCongF\ is used in derivations of some other rules.
+We often omit details of applying this rule for brevity.
+
+\begin{figure}[H]
+  \onehalfspacing
+  \begin{mathpar}
+    \inferrule[\rCCong]
+      { \ccE_1 \equiv \ccE_1' \\
+        \ccE_2 \equiv \ccE_2' \\
+        \fE \equiv \fE' }
+      { \chc{\ccE_1, \ccE_2}
+        \equiv
+        \chc[\fE']{\ccE_1', \ccE_2'} } \\
+
+    \inferrule[\rCCongF]
+      { \fE \equiv \fE' }
+      { \chc{\ccE_1, \ccE_2}
+        \equiv
+        \chc[\fE']{\ccE_1, \ccE_2} }
+
+    \inferrule[\rCCongL]
+      { \ccE_1 \equiv \ccE_1' }
+      { \chc{\ccE_1, \ccE_2}
+        \equiv
+        \chc{\ccE_1', \ccE_2} }
+
+    \inferrule[\rCCongR]
+      { \ccE_2 \equiv \ccE_2' }
+      { \chc{\ccE_1, \ccE_2}
+        \equiv
+        \chc{\ccE_1, \ccE_2'} }
+  \end{mathpar}
+  \caption{Choice congruence rules.}
+  \label{fig:ccong}
+\end{figure}
+
+\begin{theorem}
+  \label{thm:ccong}
+  The choice congruence rules hold for all formulas $\fE, \fE' \in \fS$ and expressions $\ccE_1, \ccE_1', \ccE_2, \ccE_2' \in \ccS$.
+\end{theorem}
+
+\begin{proof}
+  First, we show \rCCongF\ and \rCCongL\ directly from the definition of expression equivalence, see \appref{fcc-coq}.
+  Next, we show \rCCongR\ by deriving the consequent from the antecedent and \rCCongL.
+  The derivation is as follows.
+  \begin{align*}
+    \chc{\ccE_1, \ccE_2}
+    &\equiv \chc[\Not \fE]{\ccE_2, \ccE_1} \\
+    &\equiv \chc[\Not \fE]{\ccE_2', \ccE_1} \\
+    &\equiv \chc{\ccE_1, \ccE_2'}
+  \end{align*}
+  Finally, \rCCong\ follows directly from the other three rules.
+\end{proof}
+
+Observe that converses of the congruence rules for choices do not hold, e.g., in general $\chc{\ccE_1, \ccE_2} \equiv \chc[\fE']{\ccE_1, \ccE_2}$ is not sufficient for $\fE \equiv \fE'$ and $\chc{\ccE_1, \ccE_2} \equiv \chc{\ccE_1', \ccE_2}$ is not sufficient for $\ccE_1 \equiv \ccE_1'$.
+For a counterexample to the converse of \rCCongF, consider $\chc[\tagL]{\aE, \aE} \equiv \aE \equiv \chc[\tagR]{\aE, \aE}$ but $\tagL \not\equiv \tagR$.
+For a counterexample to the converse of \rCCongL, consider $\chc[\tagR]{\aE, \aE} \equiv \aE \equiv \chc[\tagR]{\aE', \aE}$ but $\aE \not\equiv \aE'$ if $\aE \ne \aE'$.
+There is a similar counterexample to the converse of \rCCongR.
+
+The choice simplification rules are stated in \figref{csimpl}.
+These rules describe certain cases where the semantics of a choice is equivalent to one of its alternatives.
+
+\begin{figure}[H]
+  \begin{mathpar}
+    \inferrule[\rCIdemp]
+      {}
+      { \chc{\ccE, \ccE} \equiv \ccE }
+
+    \inferrule[\rCL]
+      {}
+      { \chc[\tagL]{\ccE_1, \ccE_2} \equiv \ccE_1 }
+
+    \inferrule[\rCR]
+      {}
+      { \chc[\tagR]{\ccE_1, \ccE_2} \equiv \ccE_2 }
+  \end{mathpar}
+  \caption{Choice simplification rules.}
+  \label{fig:csimpl}
+\end{figure}
+
+\begin{theorem}
+  \label{thm:csimpl}
+  The choice simplification rules hold for all formulas $\fE \in \fS$ and expressions $\ccE, \ccE_1, \ccE_2 \in \ccS$.
+\end{theorem}
+
+\begin{proof}
+  First, we show \rCIdemp\ and \rCL\ directly from the definition of expression equivalence, see \appref{fcc-coq}.
+  Next, we show \rCR\ by \rCL\ and $\Not \tagR \equiv \tagL$, which can be shown from the formula congruence and algebraic rules, see \appref{f-coq}.
+  The derivation of \rCR\ is as follows.
+  \begin{align*}
+    \chc[\tagR]{\ccE_1, \ccE_2}
+    &\equiv \chc[\Not \tagR]{\ccE_2, \ccE_1} \\
+    &\equiv \chc[\tagL]{\ccE_2, \ccE_1} \\
+    &\equiv \ccE_2 \qedhere
+  \end{align*}
+\end{proof}
+
+The formula choice rules are stated in \figref{fc}.
+Redundant alternatives in nested choices can be eliminated while preserving semantics by applying these rules from left-to-right.
+
+\begin{figure}[H]
+  \begin{mathpar}
+    \inferrule[\rCJoin]
+      {}
+      { \chc[\fE_1]{
+          \ccE_1,
+          \chc[\fE_2]{\ccE_1, \ccE_2}}
+        \equiv
+        \chc[(\fE_1 \lor \fE_2)]{\ccE_1, \ccE_2} }
+
+    \inferrule[\rCMeet]
+      {}
+      { \chc[\fE_1]{
+          \chc[\fE_2]{\ccE_1, \ccE_2},
+          \ccE_2}
+        \equiv
+        \chc[(\fE_1 \land \fE_2)]{\ccE_1, \ccE_2} }
+
+    \inferrule[\rCJoinC]
+      {}
+      { \chc[\fE_1]{
+          \ccE_1,
+          \chc[\fE_2]{\ccE_2, \ccE_1}}
+        \equiv
+        \chc[(\fE_1 \lor \Not \fE_2)]{\ccE_1, \ccE_2} }
+
+    \inferrule[\rCMeetC]
+      {}
+      { \chc[\fE_1]{
+          \chc[\fE_2]{\ccE_2, \ccE_1},
+          \ccE_2}
+        \equiv
+        \chc[(\fE_1 \land \Not \fE_2)]{\ccE_1, \ccE_2} }
+  \end{mathpar}
+  \caption{Formula choice rules.}
+  \label{fig:fc}
+\end{figure}
+
+\begin{theorem}
+  \label{thm:fc}
+  The formula choice rules hold for all formulas $\fE_1, \fE_2 \in \fS$ and expressions $\ccE_1, \ccE_2 \in \ccS$.
+\end{theorem}
+
+\begin{proof}
+  First, we show \rCJoin\ directly from the definition of expression equivalence, see \appref{fcc-coq}.
+  Next, we show \rCMeet\ by \rCJoin\ and \rCompMeet.
+  The derivation of \rCMeet\ is as follows.
+  \begin{align*}
+    \chc[\fE_1]{
+      \chc[\fE_2]{\ccE_1, \ccE_2},
+      \ccE_2} &\equiv
+    \chc[\Not\fE_1]{
+      \ccE_2,
+      \chc[\Not\fE_2]{\ccE_2, \ccE_1}} \\
+    &\equiv \chc[(\Not \fE_1 \lor \Not \fE_2)]{\ccE_2, \ccE_1} \\
+    &\equiv \chc[\Not(\fE_1 \land \fE_2)]{\ccE_2, \ccE_1} \\
+    &\equiv \chc[(\fE_1 \land \fE_2)]{\ccE_1, \ccE_2}
+  \end{align*}
+  Finally, we show \rCJoinC\ and \rCMeetC\ by \rCJoin\ and \rCMeet, respectively.
+  The derivation of \rCJoinC\ is as follows.
+  \begin{align*}
+    \chc[\fE_1]{
+      \ccE_1,
+      \chc[\fE_2]{\ccE_2, \ccE_1}} &\equiv
+    \chc[\fE_1]{
+      \ccE_1,
+      \chc[\Not \fE_2]{\ccE_1, \ccE_2}} \\
+    &\equiv \chc[(\fE_1 \lor \Not \fE_2)]{\ccE_1, \ccE_2}
+  \end{align*}
+  The derivation of \rCMeetC\ is as follows.
+  \begin{align*}
+    \chc[\fE_1]{
+      \chc[\fE_2]{\ccE_2, \ccE_1},
+      \ccE_2} &\equiv
+    \chc[\fE_1]{
+      \chc[\Not \fE_2]{\ccE_1, \ccE_2},
+      \ccE_2} \\
+    &\equiv \chc[(\fE_1 \land \Not \fE_2)]{\ccE_1, \ccE_2} \qedhere
+  \end{align*}
+\end{proof}
+
+The choice merge rules are stated in \figref{ccmerge}.
+Unselectable alternatives in nested choices can be eliminated while preserving semantics by applying these rules from left-to-right.
+Note that these rules are not independent of each other.
+For example, we derive \rCCMerge\ from the other two choice merge rules in \thmref{ccmerge}.
+Alternatively, we could derive \rCCMergeL\ and \rCCMergeR\ from \rCCMerge\ and \rCIdemp.
+
+\begin{figure}[H]
+  \onehalfspacing
+  \begin{mathpar}
+    \inferrule[\rCCMerge]
+      {}
+      { \chc{
+          \chc{\ccE_1, \ccE_2},
+          \chc{\ccE_3, \ccE_4}}
+        \equiv
+        \chc{\ccE_1, \ccE_4} } \\
+
+    \inferrule[\rCCMergeL]
+      {}
+      { \chc{
+          \chc{\ccE_1, \ccE_2},
+          \ccE_3}
+        \equiv
+        \chc{\ccE_1, \ccE_3} }
+
+    \inferrule[\rCCMergeR]
+      {}
+      { \chc{
+          \ccE_1,
+          \chc{\ccE_2, \ccE_3}}
+        \equiv
+        \chc{\ccE_1, \ccE_3} }
+  \end{mathpar}
+  \caption{Choice merge rules.}
+  \label{fig:ccmerge}
+\end{figure}
+
+\begin{theorem}
+  \label{thm:ccmerge}
+  The choice merge rules hold for all formulas $\fE_1, \fE_2 \in \fS$, and expressions $\ccE_1, \ccE_2, \ccE_3, \ccE_4 \in \ccS$.
+\end{theorem}
+
+\begin{proof}
+  First, we show \rCCMergeL\ directly from the definition of expression equivalence, see \appref{fcc-coq}.
+  Next, we show \rCCMergeR\ by \rCCMergeL.
+  The derivation of \rCCMergeR\ is as follows.
+  \begin{align*}
+    \chc{\ccE_1, \chc{\ccE_2, \ccE_3}} &\equiv
+    \chc[\Not\fE]{
+      \chc[\Not\fE]{\ccE_3, \ccE_2},
+      \ccE_1} \\
+    &\equiv \chc[\Not\fE]{\ccE_3, \ccE_1} \\
+    &\equiv \chc{\ccE_1, \ccE_3}
+  \end{align*}
+  Finally, \rCCMerge\ follows directly from the other two rules.
+\end{proof}
+
+The object-choice commutation rule is stated in \figref{occomm}.
+Although this rule refers to formula choices directly, it does not differ from the corresponding rule for dimension choices in a meaningful way.
+For completeness, we include a proof of this rule in \appref{fcc-coq}.
+
+\begin{figure}[H]
+  \onehalfspacing
+  \begin{mathpar}
+    \inferrule[\rCOSwap]
+      {}
+      { \chc{
+          \tr{\ccE_1, \ccE_2},
+          \tr{\ccE_3, \ccE_4}}
+        \equiv
+        \tr{
+          \chc{\ccE_1, \ccE_3},
+          \chc{\ccE_2, \ccE_4}} }
+  \end{mathpar}
+  \caption{Object-choice commutation rule.}
+  \label{fig:occomm}
+\end{figure}
+
+The choice-choice commutation rules are stated in \figref{ccswap}.
+%Redundant alternatives in nested choices can be eliminated while preserving semantics by applying \rCCSwapL\ or \rCCSwapR\ from right-to-left.
+Observe that we derived \rCCSwapL\ from \rCCSwap\ and \rCIdemp\ in the proof of \thmref{ccswap}.
+Alternatively, we could derive \rCCSwap\ from the other two choice-choice commutation rules, and the choice merge rules.
+
+\begin{figure}[H]
+  \onehalfspacing
+  \begin{mathpar}
+    \inferrule[\rCCSwap]
+      {}
+      { \chc[\fE_1]{
+          \chc[\fE_2]{\ccE_1, \ccE_2},
+          \chc[\fE_2]{\ccE_3, \ccE_4}}
+        \equiv
+        \chc[\fE_2]{
+          \chc[\fE_1]{\ccE_1, \ccE_3},
+          \chc[\fE_1]{\ccE_2, \ccE_4}} } \\
+
+    \inferrule[\rCCSwapL]
+      {}
+      { \chc[\fE_1]{
+          \chc[\fE_2]{\ccE_1, \ccE_2},
+          \ccE_3}
+        \equiv
+        \chc[\fE_2]{
+          \chc[\fE_1]{\ccE_1, \ccE_3},
+          \chc[\fE_1]{\ccE_2, \ccE_3}} }
+
+    \inferrule[\rCCSwapR]
+      {}
+      { \chc[\fE_1]{
+          \ccE_1,
+          \chc[\fE_2]{\ccE_2, \ccE_3}}
+        \equiv
+        \chc[\fE_2]{
+          \chc[\fE_1]{\ccE_1, \ccE_2},
+          \chc[\fE_1]{\ccE_1, \ccE_3}} }
+  \end{mathpar}
+  \caption{Choice-choice commutation rules.}
+  \label{fig:ccswap}
+\end{figure}
+
+\begin{theorem}
+  \label{thm:ccswap}
+  The choice-choice commutation rules hold for all formulas $\fE_1, \fE_2 \in \fS$, and expressions $\ccE_1, \ccE_2, \ccE_3, \ccE_4 \in \ccS$.
+\end{theorem}
+
+\begin{proof}
+  First, we show \rCCSwap\ directly from the definition of expression equivalence, see \appref{fcc-coq}.
+  Next, we show \rCCSwapL\ by \rCCSwap\ and \rCIdemp.
+  The derivation of \rCCSwapL\ is as follows.
+  \begin{align*}
+    \chc[\fE_1]{
+      \chc[\fE_2]{\ccE_1, \ccE_2},
+      \ccE_3}
+    &\equiv
+    \chc[\fE_1]{
+      \chc[\fE_2]{\ccE_1, \ccE_2},
+      \chc[\fE_2]{\ccE_3, \ccE_3}} \\
+    &\equiv
+    \chc[\fE_2]{
+      \chc[\fE_1]{\ccE_1, \ccE_3},
+      \chc[\fE_1]{\ccE_2, \ccE_3}}
+  \end{align*}
+  Finally, we show \rCCSwapR\ by \rCCSwapL.
+  The derivation of \rCCSwapR\ is as follows.
+  \begin{align*}
+    \chc[\fE_1]{
+      \ccE_1,
+      \chc[\fE_2]{\ccE_2, \ccE_3}}
+    &\equiv
+     \chc[\Not\fE_1]{
+       \chc[\fE_2]{\ccE_2, \ccE_3},
+       \ccE_1} \\
+    &\equiv
+    \chc[\fE_2]{
+      \chc[\Not\fE_1]{\ccE_2, \ccE_1},
+      \chc[\Not\fE_1]{\ccE_3, \ccE_1}} \\
+    &\equiv
+    \chc[\fE_2]{
+      \chc[\fE_1]{\ccE_1, \ccE_2},
+      \chc[\fE_1]{\ccE_1, \ccE_3}} \qedhere
+  \end{align*}
+\end{proof}
+
+\section{Generalizations}
+\label{sec:ccgen}
+
+%It is difficult to extend formula choices with more alternatives.
+Similar to dimension choices, formula choices can be extended to support more alternatives by adding tags to the set of tags and corresponding cases to the semantics of choices.
+%In this way, the number of alternatives is equal to the number of tags.
+However, the set of tags must also form a Boolean algebra---unlike the corresponding extension for dimension choices.
+Since any non-trivial Boolean algebra has an even number of elements, it follows that formula choices cannot be extended with an odd number of alternatives in this way.
+
+To see why any non-trivial Boolean algebra has an even number of elements, note that any Boolean algebra is a group with law of composition given by symmetric difference.
+In such a group, every element is its own inverse.
+This means the order of a non-identity element is two, which means the order of the group is a multiple of two by Lagrange's theorem~\citep[p.~89]{dummitfoote}.
+
+Notwithstanding this limitation, formula choices can be extended with an even number of alternatives.
+Consider the following example of extending formula choices with four alternatives.
+The set $\tagS = \set{\tagLL, \tagLR, \tagRL, \tagRR}$ together with the operators defined by the tables in \figref{tag-ext} is the Boolean algebra with four elements---up to isomorphism---where \tagLL\ is ``true'' and \tagRR\ is ``false.''
+The syntax and semantics of formulas is defined in the same way as before.
+For expressions, we extend the syntax and semantics of choices in a similar way to the example extension from \secref{ccback}, albeit with four alternatives and cases instead of three.
+
+\begin{figure}[H]
+  \onehalfspacing
+  $$
+    \begin{array}{c|c}
+      \tagE & \Not \tagE \\
+      \hline
+      \tagLL & \tagRR \\
+      \tagLR & \tagRL \\
+      \tagRL & \tagLR \\
+      \tagRR & \tagLL \\
+    \end{array}
+    \qquad
+    \begin{array}{c|cccc}
+      \lor & \tagLL & \tagLR & \tagRL & \tagRR \\
+      \hline
+      \tagLL & \tagLL & \tagLL & \tagLL & \tagLL \\
+      \tagLR & \tagLL & \tagLR & \tagLL & \tagLR \\
+      \tagRL & \tagLL & \tagLL & \tagRL & \tagRL \\
+      \tagRR & \tagLL & \tagLR & \tagRL & \tagRR \\
+    \end{array}
+    \qquad
+    \begin{array}{c|cccc}
+      \land & \tagLL & \tagLR & \tagRL & \tagRR \\
+      \hline
+      \tagLL & \tagLL & \tagLR & \tagRL & \tagRR \\
+      \tagLR & \tagLR & \tagLR & \tagRR & \tagRR \\
+      \tagRL & \tagRL & \tagRR & \tagRL & \tagRR \\
+      \tagRR & \tagRR & \tagRR & \tagRR & \tagRR \\
+    \end{array}
+  $$
+  \caption{Boolean algebra on four tags.}
+  \label{fig:tag-ext}
+\end{figure}
+
+The equivalence rules for choices must be modified as well.
+The choice merge rule \rCCMerge\ is replaced with the following rule:
+\begin{mathpar}
+  \inferrule%[\rCCMerge]
+    { \ccE_i = \chc{\ccE_{i1}, \ccE_{i2}, \ccE_{i3}, \ccE_{i4}} \\
+      \Forall i \in \set{1, 2, 3, 4} }
+    { \chc{\ccE_1, \ccE_2, \ccE_3, \ccE_4}
+      \equiv
+      \chc{\ccE_{11}, \ccE_{22}, \ccE_{33}, \ccE_{44}} }
+\end{mathpar}
+Note that there are four premises of this rule.
+The choice-choice commutation rule \rCCSwap\ is replaced with the following rule:
+\begin{mathpar}
+  \inferrule%[\rCCSwap]
+    { \ccE_i = \chc[\fE']{\ccE_{i1}, \ccE_{i2}, \ccE_{i3}, \ccE_{i4}} \\
+      \ccE_i' = \chc{\ccE_{1i}, \ccE_{2i}, \ccE_{3i}, \ccE_{4i}} \\
+      \Forall i \in \set{1, 2, 3, 4} }
+    { \chc{\ccE_1, \ccE_2, \ccE_3, \ccE_4}
+      \equiv
+      \chc[\fE']{\ccE_1', \ccE_2', \ccE_3', \ccE_4'} }
+\end{mathpar}
+Note that there are eight premises of this rule.
+Similar modifications must be made to other rules.

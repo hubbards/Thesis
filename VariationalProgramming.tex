@@ -1,0 +1,517 @@
+\chapter{Variational Programming}
+\label{ch:vp}
+
+In this chapter, we establish sound map\footnote{The map operation is part of the definition of a functor.} and bind\footnote{The bind operation is part of the definition of a monad.} operations for option-lists.
+We also provide a general definition of soundness for operations on variational data structures.
+Variational lists are functional data structures for representation and computation with variation in lists using the choice calculus~\citep{WE12gpce}.
+Option-lists are an efficient implementation of variational lists which support sharing of list elements among variant lists~\citep{Walk14onward}.
+Variational data structures are described in \secref{var} and variational lists are described in \secref{olist}.
+A sound map operation is established in \secref{map} and a sound bind operation is established in \secref{bind}.
+
+\section{Variational Data Structures}
+\label{sec:var}
+
+%Throughout this chapter, let \Val\ and \ValY\ be arbitrary types, i.e., type variables.
+A \vocab{variational value} of type \Val\ is a value of type \Var[\Val], which is the choice calculus instantiated with type \Val.
+The abstract syntax of variational values is described for an arbitrary type \Val\ by the grammar in \figref{varsyn}.
+Note that formula choices are used.
+However, formula choices could be replaced by dimension choices---along with appropriate changes to selection---and the results of this chapter would still hold.
+
+\begin{figure}[H]
+  \onehalfspacing
+  \begin{syntax}
+    \val \in \Val &&& \textit{Value} \\
+    \var \in \Var[\Val]
+    & ::= & \val & \\
+    & | & \chc{\var, \var} & \textit{Choice}
+  \end{syntax}
+  \caption{Variational value syntax.}
+  \label{fig:varsyn}
+\end{figure}
+
+The selection operation for variational values is given by the function \sel, which is defined for an arbitrary type \Val\ by the equations in \figref{vsel}.
+In the last equation, note that if $\fSem[\cE]{\fE} \ne \tagL$, then $\fSem[\cE]{\fE} = \tagR$.
+This function selects a variant from a variational value.
+
+\begin{figure}[H]
+  \onehalfspacing
+  \begin{alignat*}{2}
+    &\mathrlap{\sel : \cS \to \Var[\Val] \to \Val} \\
+    &\sel\ \cE\ \val &&= \val \\
+    &\sel\ \cE\ \chc{\var_1, \var_2} &&=
+    \begin{cases}
+      \sel\ \cE\ \var_1, & \text{if }\fSem[\cE]{\fE} = \tagL \\
+      \sel\ \cE\ \var_2, & \text{otherwise}%(\fSem[\cE]{\fE} = \tagR)
+    \end{cases}
+  \end{alignat*}
+  \caption{Selection operation for variational values.}
+  \label{fig:vsel}
+\end{figure}
+
+For example, consider variational integers.
+A variational integer is a variational value with integer variants.
+Suppose $\dE_1$ and $\dE_2$ are dimensions.
+Then $\chc[\dE_1]{1,\chc[\dE_2]{2,3}}$ is a variational integer.
+This variational integer consists of a choice.
+The label of the choice is the dimension $\dE_1$ and the alternatives are the integer $1$ and the nested choice $\chc[\dE_2]{2,3}$.
+The label of the nested choice is the dimension $\dE_2$ and the alternatives are the integers $2$ and $3$.
+Moreover, for each configuration \cE, the image of this variational integer under the partially applied function $\sel\ \cE$ is the following:
+%
+\begin{inparaenum}[(1)]
+  \item if $\cE\ \dE_1 = \tagL$, then the image is the integer $1$,
+  \item if $\cE\ \dE_1 = \tagR$ and $\cE\ \dE_2 = \tagL$, then the image is the integer $2$, and
+  \item if $\cE\ \dE_1 = \tagR$ and $\cE\ \dE_2 = \tagR$, then the image is the integer $3$.
+\end{inparaenum}
+
+%A \vocab{variational function} is a function with type $\Var[\Val] \to \Var[\ValY]$, for some types \Val\ and \ValY.
+A function $\varphi : \Var[\Val] \to \Var[\ValY]$ is \vocab{sound} at a configuration $\cE \in \cS$ and with respect to a function $\psi : \Val \to \ValY$ if the equality
+$
+\sel\ \cE \comp \varphi = \psi \comp \sel\ \cE
+$
+holds.
+Equivalently, the following diagram commutes:
+$$
+  \begin{tikzcd}
+    \Var[\Val] \ar[d, "\sel\ \cE"'] \ar[r, "\varphi"] &
+    \Var[\ValY] \ar[d, "\sel\ \cE"] \\
+    \Val \ar[r, "\psi"'] & \ValY
+  \end{tikzcd}
+$$
+Moreover, a function $\varphi$ is \vocab{sound} with respect to a function $\psi$ if $\varphi$ is sound at every configuration with respect to $\psi$.
+%Whenever the definition of soundness at a configuration is extended to other functions, the previous definition is extended as well.
+Informally, a (variational) function is sound at a configuration and with respect to a (plain) function if for each element in the domain of the variational function,
+%
+\begin{inparaenum}[(1)]
+  \item the image under the plain function of the variant selected from the element is equivalent to
+  \item the variant selected from the image of the element under the variational function.
+\end{inparaenum}
+
+In general, a data structure is given by a type constructor \TConsU\ and the corresponding \vocab{variational data structure} is \TConsVU.
+A data structure \TConsW\ \vocab{implements} a variational data structure \TConsVU\ with a selection operation given by a polymorphic function $\wsel : \cS \to \TConsWX \to \TConsUX$ with type variable \Val.
+
+Suppose \TConsW\ implements \TConsVU\ with selection given by \wsel.
+Then a function $\varphi : \TConsWX \to \TConsWY$ is \vocab{sound} at a configuration $\cE \in \cS$ and with respect to a function $\psi : \TConsUX \to \TConsUY$ if the equality $\wsel\ \cE \comp \varphi = \psi \comp \wsel\ \cE$ holds.
+Equivalently, the following diagram commutes:
+$$
+  \begin{tikzcd}
+    \TConsWX \ar[d, "\wsel\ \cE"'] \ar[r, "\varphi"] &
+    \TConsWY \ar[d, "\wsel\ \cE"] \\
+    \TConsUX \ar[r, "\psi"'] & \TConsUY
+  \end{tikzcd}
+$$
+Moreover, a function $\varphi$ is \vocab{sound} with respect to a function $\psi$ if $\varphi$ is sound at every configuration with respect to $\psi$.
+
+\section{Variational Lists}
+\label{sec:olist}
+
+An \vocab{option} (or \vocab{optional value}) of type \Val\ is a value of the lifted type $\LVal = \Val \cup \set{\Bot}$ where $\Bot \notin \Val$.
+The symbol \Bot\ is called the \vocab{bottom value}.
+Note that we use the symbol \Bot\ to denote the bottom values of both \LVal\ and \LValY.
+A \vocab{variational option} of type \Val\ is a value of type \Var.
+
+A \vocab{list} of elements of type \Val\ is a list of type \Lst.
+The standard abstract syntax for lists is described for an arbitrary type \Val\ by the grammar in \figref{listsyn}.
+A \vocab{variational list} of elements of type \Val\ is a value of type \Var[(\Lst)].
+An \vocab{option-list} of elements of type \Val\ is a list of type \Lst[(\Var)].
+For convenience, we write this as \OLst, i.e., $\OLst = \Lst[(\Var)]$.
+%The syntax for option-lists is described by the grammar in \figref{olistsyn}.
+
+\begin{figure}[H]
+  \onehalfspacing
+  \begin{syntax}
+    \val \in \Val &&& \textit{Element} \\
+    \lst \in \Lst
+    & ::= & \nil & \textit{Nil} \\
+    & | & \val \cons \lst & \textit{Cons}
+  \end{syntax}
+  \caption{List syntax.}
+  \label{fig:listsyn}
+\end{figure}
+
+%\begin{figure}[H]
+%  \onehalfspacing
+%  \begin{syntax}
+%    \lst \in \OLst
+%    & ::= & \nil & \textit{Nil} \\
+%    & | & \var \cons \lst & \textit{Cons}
+%  \end{syntax}
+%  \caption{Option-list syntax.}
+%  \label{fig:olistsyn}
+%\end{figure}
+
+Option-lists are an implementation of variational lists with selection given by the function \osel, which is defined for an arbitrary type \Val\ by the equations in \figref{osel}.
+In the last equation, note that if $\sel\ \cE\ \var \ne \val$, then $\sel\ \cE\ \var = \bot$ since $\var \in \Var$ and so $\sel\ \cE\ \var \in \LVal$.
+This function selects a variant list from an option-list by selecting variant elements from the option-list elements and discarding those which are the bottom value.
+
+\begin{figure}[H]
+  \onehalfspacing
+  \begin{alignat*}{2}
+    &\mathrlap{\osel : \cS \to \OLst \to \Lst} \\
+    &\osel\ \cE\ \nil &&= \nil \\
+    &\osel\ \cE\ (\var \cons \lst) &&=
+    \begin{cases}
+      \val \cons \osel\ \cE\ \lst, & \text{if }\sel\ \cE\ \var = \val \\
+      \osel\ \cE\ \lst, & \text{otherwise}%(\sel\ \cE\ \var = \bot)
+    \end{cases}
+  \end{alignat*}
+  \caption{Selection operation for option-list.}
+  \label{fig:osel}
+\end{figure}
+
+%A function $\varphi : \OLst \to \OLst[\ValY]$ is \vocab{sound} at a configuration $\cE \in \cS$ and with respect to a function $\psi : \Lst \to \Lst[\ValY]$ if the equality $\osel\ \cE \comp \varphi = \psi \comp \osel\ \cE$ holds.
+%Equivalently, the following diagram commutes:
+%$$
+%  \begin{tikzcd}
+%    \OLst \ar[d, "\osel\ \cE"'] \ar[r, "\varphi"] &
+%    \OLst[\ValY] \ar[d, "\osel\ \cE"] \\
+%    \Lst \ar[r, "\psi"'] & \Lst[\ValY]
+%  \end{tikzcd}
+%$$
+%$$
+%  \begin{tikzcd}[row sep=scriptsize, column sep=scriptsize]
+%    & 1 \ar[dl] \ar[rr] \ar[dd] & & 2 \ar[dl] \ar[dd] \\
+%    3 \ar[rr, crossing over] \ar[dd] & & 4 \\
+%    & 5 \ar[dl] \ar[rr] &  & 6 \ar[dl] \\
+%    7 \ar[rr] & & 8 \ar[from=uu, crossing over]\\
+%  \end{tikzcd}
+%$$
+
+For example, consider lists and option-lists of integers.
+For convenience, we write the concrete syntax of lists as comma separated sequences of elements delimited by square brackets, e.g., \clst{1, 2, 3} and \clst{2, 4} are lists of integers in the concrete syntax which correspond to the lists of integers $1 \cons 2 \cons 3 \cons \nil$ and $2 \cons 4 \cons \nil$, respectively, in the abstract syntax.
+%A list of integers is a list where the elements are integers, e.g.,  $\lbrack 1, 2, 3\rbrack$ and $\lbrack 2, 4\rbrack$ are lists of integers.
+%Note that we omit the last cons and nil constructs when writing specific examples of lists.
+An option list of integers is a list where the elements are variational options and the non-bottom variants are integers.
+Suppose \dE\ is a dimension.
+Then \clst{\chc[\dE]{1, \bot}, 2, \chc[\dE]{3, 4}} is an option-list of integers.
+%The first element of this list is the choice $\chc[\dE]{1, \bot}$, with label \dE\ and alternatives $1$ and $\bot$.
+%The second element of this list is the integer $2$.
+%The third element of this list is the choice $\chc[\dE]{3, 4}$, with label \dE\ and alternatives $3$ and $4$.
+Moreover, for each configuration \cE, the image of this option-list under the partially applied function $\osel\ \cE$ is the following:
+%
+\begin{inparaenum}[(1)]
+  \item if $\cE\ \dE = \tagL$, then the image is the variant list \clst{1, 2, 3} and
+  \item if $\cE\ \dE = \tagR$, then the image is the variant list \clst{2, 4}.
+\end{inparaenum}
+
+\subsection{Map Operation}
+\label{sec:map}
+
+The list type constructor \Lst[(\cdot)] together with some map operation form a functor~\citep{Wad92fp,Wad92monad,Wad95monad}.
+The standard map operation for lists is given by the function \lmap, which is defined for arbitrary types \Val\ and \ValY\ by the equations in \figref{map}.
+This function maps a function over the elements of a list.
+
+\begin{figure}[H]
+  \onehalfspacing
+  \begin{alignat*}{2}
+    &\mathrlap{\lmap : (\Val \to \ValY) \to \Lst \to \Lst[\ValY]} \\
+    &\lmap\ \varphi\ \nil &&= \nil \\
+    &\lmap\ \varphi\ (\val \cons \lst)
+    &&= \varphi\ \val \cons \lmap\ \varphi\ \lst
+  \end{alignat*}
+  \caption{Map operation for list.}
+  \label{fig:map}
+\end{figure}
+
+%For example, consider applying the function \lmap\ to the function \lam{x}{x^2} and the list of integers $1 \cons 2 \cons 3$.
+%The image of the list of integers $1 \cons 2 \cons 3$ under the partially applied function $\lmap\ (\lam{x}{x^2})$ is the list of integers $1 \cons 4 \cons 9$.
+
+It can be shown that the option-list type constructor \OLst[(\cdot)] together with some map operation form a functor.
+The map operation for option-lists is given by the function \omap, which is defined for arbitrary types \Val\ and \ValY\ by the equations in \figref{omap}.
+This function maps a function over the elements of an option-list.
+
+\begin{figure}[H]
+  \onehalfspacing
+  \begin{alignat*}{2}
+    &\mathrlap{\omap : (\Val \to \ValY) \to \OLst \to \OLst[\ValY]} \\
+    &\omap\ \varphi\ \nil &&= \nil \\
+    &\omap\ \varphi\ (\var \cons \lst)
+    &&= \hmap\ \varphi\ \var \cons \omap\ \varphi\ \lst
+  \end{alignat*}
+  \caption{Map operation for option-lists.}
+  \label{fig:omap}
+\end{figure}
+
+The function \hmap\ is defined for arbitrary types \Val\ and \ValY\ by the equations in \figref{vmap}.
+This function maps a function over the variants of a variational option.
+
+\begin{figure}[H]
+  \onehalfspacing
+  \begin{alignat*}{2}
+    &\mathrlap{\hmap : (\Val \to \ValY) \to \Var \to \VarY} \\
+    &\hmap\ \varphi\ \Bot &&= \Bot \\
+    &\hmap\ \varphi\ \val &&= \varphi\ \val \\
+    &\hmap\ \varphi\ \chc{\var_1, \var_2}
+    &&= \chc{\hmap\ \varphi\ \var_1, \hmap\ \varphi\ \var_2}
+  \end{alignat*}
+  \caption{\hmap\ function definition.}
+  \label{fig:vmap}
+\end{figure}
+
+%For example, consider applying the function \omap\ to the function \lam{x}{x^2} and the option-list of integers $\chc[\dE]{1, 2} \cons 3 \cons \chc[\dE]{4, \bot}$.
+%The image of the option-list of integers $\chc[\dE]{1, 2} \cons 3 \cons \chc[\dE]{4, \bot}$ under the partially applied function $\omap\ (\lam{x}{x^2})$ is the option-list of integers $\chc[\dE]{1, 4} \cons 9 \cons \chc[\dE]{16, \bot}$.
+
+We use \lemref{vselnone} and \lemref{vselsome} to prove soundness of the map operation for option-lists.
+Informally, the first lemma says that mapping a function over a variant which is the bottom value does not change the value of the variant and the second lemma says that mapping a function over a variant which is a (non-bottom) value results in application of the function to that value.
+
+\begin{lemma}
+  \label{lem:vselnone}
+  For all configurations $\cE \in \cS$, functions $\varphi : \Val \to \ValY$, and variational options $\var \in \Var$, if
+  $
+    \sel\ \cE\ \var = \Bot
+  $,
+  then
+  $
+    \sel\ \cE\ (\hmap\ \varphi\ \var) = \Bot
+  $.
+\end{lemma}
+
+\begin{proof}
+  We will use structural induction on $\var$.
+
+  For the first base case, suppose $\var = \Bot$.
+  Then by the definitions of \hmap\ and \sel\ we have $\sel\ \cE\ (\hmap\ \varphi\ \Bot) = \Bot$ and we are done.
+  For the second base case, suppose $\var = \val$ for some value $\val \in \Val$.
+  Then by the definition of \sel\ and the hypothesis of the lemma we have $\val = \sel\ \cE\ \val = \Bot$, which is a contradiction and so this case is impossible.
+
+  For the induction step, suppose $\var = \chc{\var_1, \var_2}$ for some formula $\fE \in \fS$ and variational options $\var_1, \var_2 \in \Var$ with the following inductive hypotheses:
+  \begin{align*}
+    \sel\ \cE\ \var_1 = \Bot &\implies
+    \sel\ \cE\ (\hmap\ \varphi\ \var_1) = \Bot \\
+    \sel\ \cE\ \var_2 = \Bot &\implies
+    \sel\ \cE\ (\hmap\ \varphi\ \var_2) = \Bot
+  \end{align*}
+  Notice that \fSem[\cE]{\fE} is either \tagL\ or \tagR.
+
+  If $\fSem[\cE]{\fE} = \tagL$, then by the definition of \sel\ and the hypothesis of the lemma we have $\sel\ \cE\ \var_1 = \sel\ \cE\ \chc{\var_1, \var_2} = \Bot$.
+  By applying this result to our first inductive hypothesis, we have the following derivation by the definitions of \hmap\ and \sel.
+  \begin{align*}
+    \sel\ \cE\ (\hmap\ \varphi\ \chc{\var_1, \var_2})
+    &= \sel\ \cE\ \chc{\hmap\ \varphi\ \var_1, \hmap\ \varphi\ \var_2} \\
+    &= \sel\ \cE\ (\hmap\ \varphi\ \var_1) \\
+    &= \Bot
+  \end{align*}
+  The case where $\fSem[\cE]{\fE} = \tagR$ follows by similar reasoning, see \appref{vp-coq}.
+\end{proof}
+
+\begin{lemma}
+  \label{lem:vselsome}
+  For all configurations $\cE \in \cS$, functions $\varphi : \Val \to \ValY$, and variational options $\var \in \Var$, if
+  $
+    \sel\ \cE\ \var = \val
+  $
+  for some value $\val\in\Val$, then
+  $
+    \sel\ \cE\ (\hmap\ \varphi\ \var) = \varphi\ \val
+  $.
+\end{lemma}
+
+\begin{proof}
+  We will use structural induction on $\var$.
+
+  For the first base case, suppose $\var = \Bot$.
+  Then by the definition of \sel\ and the hypothesis of the lemma we have $\Bot = \sel\ \cE\ \Bot = \val$, which is a contradiction and so this case is impossible.
+  For the second base case, suppose $\var = \val'$ for some value $\val' \in \Val$.
+  Then by the definition of \sel\ and the hypothesis of the lemma we have $\val' = \sel\ \cE\ \val' = \val$.
+  By the definitions of \hmap\ and \sel, this means
+  $
+    \sel\ \cE\ (\hmap\ \varphi\ \val')
+    = \varphi\ \val'
+    = \varphi\ \val
+  $.
+
+  For the induction step, suppose $\var = \chc{\var_1, \var_2}$ for some formula $\fE \in \fS$ and variational options $\var_1, \var_2 \in \Var$ with the following inductive hypotheses:
+  \begin{align*}
+    \sel\ \cE\ \var_1 = \val &\implies
+    \sel\ \cE\ (\hmap\ \varphi\ \var_1) = \val \\
+    \sel\ \cE\ \var_2 = \val &\implies
+    \sel\ \cE\ (\hmap\ \varphi\ \var_2) = \val
+  \end{align*}
+  Notice that \fSem[\cE]{\fE} is either \tagL\ or \tagR.
+
+  If $\fSem[\cE]{\fE} = \tagL$, then by the definition of \sel\ and the hypothesis of the lemma we have $\sel\ \cE\ \var_1 = \sel\ \cE\ \chc{\var_1, \var_2} = \val$.
+  By applying this result to our first inductive hypothesis, we have the following derivation by the definitions of \hmap\ and \sel.
+  \begin{align*}
+    \sel\ \cE\ (\hmap\ \varphi\ \chc{\var_1, \var_2})
+    &= \sel\ \cE\ \chc{\hmap\ \varphi\ \var_1, \hmap\ \varphi\ \var_2} \\
+    &= \sel\ \cE\ (\hmap\ \varphi\ \var_1) \\
+    &= \val
+  \end{align*}
+  The case where $\fSem[\cE]{\fE} = \tagR$ follows by similar reasoning, see \appref{vp-coq}.
+\end{proof}
+
+We use the definition of soundness for option-lists to define soundness of the map operation for option-lists.
+The map operation for option-lists is \vocab{sound} if for each function $\varphi : \Val \to \ValY$, the function $\omap\ \varphi$ is sound with respect to the function $\lmap\ \varphi$.
+This is stated formally by \thmref{map}.
+A machine verified version of the proof of this theorem is presented in \appref{vp-coq}.
+
+\begin{theorem}
+  \label{thm:map}
+  For all configurations $\cE \in \cS$ and functions $\varphi : \Val \to \ValY$, the equality
+  $
+    \osel\ \cE \comp \omap\ \varphi =
+    \lmap\ \varphi \comp \osel\ \cE
+  $
+  holds.
+  Equivalently, the following diagram commutes:
+  $$
+    \begin{tikzcd}
+      \OLst \ar[d, "\osel\ \cE"'] \ar[r, "\omap\ \varphi"] &
+      \OLst[\ValY] \ar[d, "\osel\ \cE"] \\
+      \Lst \ar[r, "\lmap\ \varphi"'] &
+      \Lst[\ValY]
+    \end{tikzcd}
+  $$
+\end{theorem}
+
+\begin{proof}
+  We will show that the equality
+  $
+    (\osel\ \cE \comp \omap\ \varphi)\ \lst =
+    (\lmap\ \varphi \comp \osel\ \cE)\ \lst
+  $
+  holds for all option-lists $\lst \in \OLst$ by structural induction on $\lst$.
+
+  For the base case, suppose that $\lst = \nil$.
+  Then we have the following derivation by the definitions of \osel, \lmap, and \omap.
+  \begin{align*}
+    (\osel\ \cE \comp \omap\ \varphi)\ \nil
+    &= \osel\ \cE\ \nil \\
+    &= \nil \\
+    &= \lmap\ \varphi\ \nil \\
+    &= (\lmap\ \varphi \comp \osel\ \cE)\ \nil
+  \end{align*}
+
+  For the induction step, suppose that $\lst = \var \cons \lst'$, for some variational option $\var \in \Var$ and option-list $\lst' \in \OLst$ with
+  $
+    (\osel\ \cE \comp \omap\ \varphi)\ \lst' =
+    (\lmap\ \varphi \comp \osel\ \cE)\ \lst'
+  $.
+  Notice that $\sel\ \cE\ \var$ is either \Bot\ or some value $\val\in\Val$.
+
+  If $\sel\ \cE\ \var = \Bot$, then $\sel\ \cE\ (\hmap\ \varphi\ \var) = \Bot$ by \lemref{vselnone} and we have the following derivation by the definitions of \osel\ and \omap\ and our inductive hypothesis.
+  \begin{align*}
+    (\osel\ \cE \comp \omap\ \varphi)\ (\var \cons \lst')
+    &= \osel\ \cE\ (\hmap\ \varphi\ \var \cons \omap\ \varphi\ \lst') \\
+    &= \osel\ \cE\ (\omap\ \varphi\ \lst') \\
+    &= (\lmap\ \varphi \comp \osel\ \cE)\ \lst' \\
+    &= (\lmap\ \varphi \comp \osel\ \cE)\ (\var \cons \lst')
+  \end{align*}
+
+  If $\sel\ \cE\ \var = \val$ for some value $\val \in \Val$, then $\sel\ \cE\ (\hmap\ \varphi\ \var) = \varphi\ \val$ by \lemref{vselsome} and we have the following derivation by the definitions of \osel, \lmap, and \omap, and our inductive hypothesis.
+  \begin{align*}
+    (\osel\ \cE \comp \omap\ \varphi)\ (\var \cons \lst')
+    &= \osel\ \cE\ (\hmap\ \varphi\ \var \cons \omap\ \varphi\ \lst') \\
+    &= \varphi\ \val \cons \osel\ \cE\ (\omap\ \varphi\ \lst') \\
+    &= \varphi\ \val \cons (\lmap\ \varphi \comp \osel\ \cE)\ \lst' \\
+    &= \lmap\ \varphi\ (\val \cons \osel\ \cE\ \lst') \\
+    &= (\lmap\ \varphi \comp \osel\ \cE)\ (\var \cons \lst')
+  \end{align*}
+  This completes the proof.
+\end{proof}
+
+\subsection{Bind Operation}
+\label{sec:bind}
+
+The list type constructor \Lst[(\cdot)] together with some bind and unit operations form a monad on the category of types~\citep{Wad92fp,Wad92monad,Wad95monad}.
+The standard bind operation for lists is given by the function \lbind, which is defined for arbitrary types \Val\ and \ValY\ by the equations in \figref{bind}.
+This function applies a function to the elements of a list and joins the results.
+The infix binary operator ($\concat$) denotes a concatenation (or append) operation for lists.
+The bind operation for lists is sometimes referred to as a concatenation-map (or flat-map) operation in programming languages.
+
+\begin{figure}[H]
+  \onehalfspacing
+  \begin{alignat*}{2}
+    &\mathrlap{\lbind : (\Val \to \Lst[\ValY]) \to \Lst \to \Lst[\ValY]} \\
+    &\lbind\ \varphi\ \nil &&= \nil \\
+    &\lbind\ \varphi\ (\val\cons\lst)
+    &&= \varphi\ \val \concat \lbind\ \varphi\ \lst
+  \end{alignat*}
+  \caption{Bind operation for lists.}
+  \label{fig:bind}
+\end{figure}
+
+It can be shown that the option-list type constructor \OLst[(\cdot)] together with some bind and unit operations form a monad on the category of types.
+The bind operation for option-lists is given by the function \obind, which is defined for arbitrary types \Val\ and \ValY\ by the equations in \figref{obind}.
+This function applies a function to the elements of an option-list and joins the results.
+
+\begin{figure}[H] % htb
+  \onehalfspacing
+  \begin{alignat*}{2}
+    &\mathrlap{\obind : (\Val \to \OLst[\ValY]) \to \OLst \to \OLst[\ValY]} \\
+    &\obind\ \varphi\ \nil &&= \nil \\
+    &\obind\ \varphi\ (\var\cons\lst)
+    &&= \hbind\ \varphi\ \var \concat \obind\ \varphi\ \lst
+  \end{alignat*}
+  \caption{Bind operation for option-lists.}
+  \label{fig:obind}
+\end{figure}
+
+The function \hbind\ is defined for arbitrary types \Val\ and \ValY\ by the equations in \figref{hbind}.
+This function applies a function to the variants of a variational option and joins the results.
+
+\begin{figure}[H]
+  \onehalfspacing
+  \begin{alignat*}{2}
+    &\mathrlap{\hbind : (\Val \to \OLst[\ValY]) \to \Var \to \OLst[\ValY]} \\
+    &\hbind\ \varphi\ \Bot &&= \nil \\
+    &\hbind\ \varphi\ \val &&= \varphi\ \val \\
+    &\hbind\ \varphi\ \chc{\var_1, \var_2}
+    &&= \hzip\ \fE\ (\hbind\ \varphi\ \var_1)\ (\hbind\ \varphi\ \var_2)
+  \end{alignat*}
+  \caption{\hbind\ function definition.}
+  \label{fig:hbind}
+\end{figure}
+
+The function \hzip\ is defined for an arbitrary type \Val\ by the equations in \figref{ozip}.
+This function forms an option-list where the elements are choices with a given formula as a label and elements of two given option-lists as alternatives.
+
+\begin{figure}[H]
+  \onehalfspacing
+  %\begin{alignat*}{3}
+  %  &\mathrlap{\hzip : \fS \to \OLst \to \OLst \to \OLst} \\
+  %  &\hzip\ \fE\ \nil\ \nil &&= \nil \\
+  %  &\hzip\ \fE\ \nil\ (\var\cons\lst)
+  %  &&= \chc{\Bot, \var}
+  %  &&\cons\hzip\ \fE\ \nil\ \lst \\
+  %  &\hzip\ \fE\ (\var\cons\lst)\ \nil
+  %  &&= \chc{\var, \Bot}
+  %  &&\cons\hzip\ \fE\ \lst\ \nil \\
+  %  &\hzip\ \fE\ (\var_1\cons\lst_1)\ (\var_2\cons\lst_2)
+  %  &&= \chc{\var_1, \var_2}
+  %  &&\cons\hzip\ \fE\ \lst_1\ \lst_2
+  %\end{alignat*}
+  \begin{alignat*}{2}
+    &\mathrlap{\hzip : \fS \to \OLst \to \OLst \to \OLst} \\
+    &\hzip\ \fE\ \nil\ \lst
+    &&= \lmap\ (\lam{\var}{\chc{\Bot, \var}})\ \lst \\
+    &\hzip\ \fE\ \lst\ \nil
+    &&= \lmap\ (\lam{\var}{\chc{\var, \Bot}})\ \lst \\
+    &\hzip\ \fE\ (\var_1\cons\lst_1)\ (\var_2\cons\lst_2)
+    &&= \chc{\var_1, \var_2} \cons\hzip\ \fE\ \lst_1\ \lst_2
+  \end{alignat*}
+  \caption{\hzip\ function definition.}
+  \label{fig:ozip}
+\end{figure}
+
+We use the definition of soundness (at a configuration) to define soundness of the bind operation for option-lists.
+The bind operation for option-lists is \vocab{sound} if for each configuration $\cE \in \cS$ and function $\varphi : \Val \to \OLst[\ValY]$, the function $\obind\ \varphi$ is sound at \cE\ and with respect to the function $\lbind\ \psi$, where $\psi = \osel\ \cE \comp \varphi$.
+This is stated formally by \thmref{bind}.
+We prove this theorem by structural induction on option-lists but the proof is rather tedious and so it is omitted here, see \appref{vp-coq}.
+
+\begin{theorem}
+  \label{thm:bind}
+  For all configurations $\cE \in \cS$ and functions $\varphi : \Val \to \OLst$, the equality
+  $
+    \osel\ \cE \comp \obind\ \varphi = \lbind\ \psi \comp \osel\ \cE
+  $
+  holds, where $\psi = \osel\ \cE \comp \varphi$.
+  Equivalently, the following diagram commutes:
+  $$
+    \begin{tikzcd}
+      \OLst \ar[d, "\osel\ \cE"'] \ar[r, "\obind\ \varphi"] &
+      \OLst[\ValY] \ar[d, "\osel\ \cE"] \\
+      \Lst \ar[r, "\lbind\ \psi"'] &
+      \Lst[\ValY]
+    \end{tikzcd}
+  $$
+\end{theorem}

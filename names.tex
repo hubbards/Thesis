@@ -1,0 +1,196 @@
+% rule names
+
+% separator
+\newcommand{\rSep}{\rn{-}}
+% constructs
+\newcommand*{\rObj}{\rn{Obj}}
+\newcommand*{\rChc}{\rn{Chc}}
+\newcommand*{\rComp}{\rn{Comp}}
+\newcommand*{\rMeet}{\rn{Meet}}
+\newcommand*{\rJoin}{\rn{Join}}
+% other components
+\newcommand*{\rCO}{\rn{CO}}
+\newcommand*{\rCC}{\rn{CC}}
+\newcommand*{\rSwap}{\rSep\rn{Swap}}
+\newcommand*{\rMerge}{\rSep\rn{Merge}}
+\newcommand*{\rE}{\rSep\rn{E}}
+\newcommand*{\rF}{\rSep\rn{F}}
+\newcommand*{\rL}{\rSep\rn{l}}
+\newcommand*{\rR}{\rSep\rn{r}}
+\newcommand*{\rFL}{\rSep\rn{L}}
+\newcommand*{\rFR}{\rSep\rn{R}}
+\newcommand*{\rFLL}{\rSep\rn{1}}
+\newcommand*{\rFLR}{\rSep\rn{2}}
+\newcommand*{\rFRL}{\rSep\rn{3}}
+\newcommand*{\rFRR}{\rSep\rn{4}}
+\newcommand*{\rRefl}{\rn{Refl}}
+\newcommand*{\rSymm}{\rn{Symm}}
+\newcommand*{\rTran}{\rn{Tran}}
+\newcommand*{\rCong}{\rSep\rn{Cong}}
+\newcommand*{\rAssoc}{\rSep\rn{Assoc}}
+\newcommand*{\rComm}{\rSep\rn{Comm}}
+\newcommand*{\rDist}{\rSep\rn{Dist}}
+\newcommand*{\rId}{\rSep\rn{Id}}
+\newcommand*{\rAnn}{\rSep\rn{Ann}}
+\newcommand*{\rIdemp}{\rSep\rn{Idemp}}
+% formula equivalence
+\newcommand*{\rReflF}{\rRefl\rF}
+\newcommand*{\rSymmF}{\rSymm\rF}
+\newcommand*{\rTranF}{\rTran\rF}
+% formula congruence
+\newcommand*{\rCompCong}{\rComp\rCong}
+\newcommand*{\rJoinCong}{\rJoin\rCong}
+\newcommand*{\rJoinCongL}{\rJoinCong\rL}
+\newcommand*{\rJoinCongR}{\rJoinCong\rR}
+\newcommand*{\rMeetCong}{\rMeet\rCong}
+\newcommand*{\rMeetCongL}{\rMeetCong\rL}
+\newcommand*{\rMeetCongR}{\rMeetCong\rR}
+% boolean algebra
+\newcommand*{\rCompL}{\rComp\rL}
+\newcommand*{\rCompR}{\rComp\rR}
+\newcommand*{\rCompIdemp}{\rComp\rIdemp}
+\newcommand*{\rCompJoin}{\rComp\rSep\rJoin}
+\newcommand*{\rCompMeet}{\rComp\rSep\rMeet}
+\newcommand*{\rJoinId}{\rJoin\rId}
+\newcommand*{\rJoinIdR}{\rJoinId\rR}
+\newcommand*{\rJoinIdL}{\rJoinId\rL}
+\newcommand*{\rJoinComp}{\rJoin\rSep\rComp}
+\newcommand*{\rJoinCompL}{\rJoinComp\rL}
+\newcommand*{\rJoinCompR}{\rJoinComp\rR}
+\newcommand*{\rJoinAnn}{\rJoin\rAnn}
+\newcommand*{\rJoinAnnL}{\rJoinAnn\rL}
+\newcommand*{\rJoinAnnR}{\rJoinAnn\rR}
+\newcommand*{\rJoinAssoc}{\rJoin\rAssoc}
+\newcommand*{\rJoinComm}{\rJoin\rComm}
+\newcommand*{\rJoinDist}{\rJoin\rDist}
+\newcommand*{\rJoinIdemp}{\rJoin\rIdemp}
+\newcommand*{\rMeetId}{\rMeet\rId}
+\newcommand*{\rMeetIdL}{\rMeetId\rL}
+\newcommand*{\rMeetIdR}{\rMeetId\rR}
+\newcommand*{\rMeetComp}{\rMeet\rSep\rComp}
+\newcommand*{\rMeetCompL}{\rMeetComp\rL}
+\newcommand*{\rMeetCompR}{\rMeetComp\rR}
+\newcommand*{\rMeetAnn}{\rMeet\rAnn}
+\newcommand*{\rMeetAnnL}{\rMeetAnn\rL}
+\newcommand*{\rMeetAnnR}{\rMeetAnn\rR}
+\newcommand*{\rMeetAssoc}{\rMeet\rAssoc}
+\newcommand*{\rMeetComm}{\rMeet\rComm}
+\newcommand*{\rMeetDist}{\rMeet\rDist}
+\newcommand*{\rMeetIdemp}{\rMeet\rIdemp}
+% expression equivalence
+\newcommand*{\rReflE}{\rRefl\rE}
+\newcommand*{\rSymmE}{\rSymm\rE}
+\newcommand*{\rTranE}{\rTran\rE}
+% choice transposition
+\newcommand*{\rCTrans}{\rChc\rSep\rTran}
+% choice congruence
+\newcommand*{\rOCong}{\rObj\rCong}
+\newcommand*{\rOCongL}{\rOCong\rL}
+\newcommand*{\rOCongR}{\rOCong\rR}
+\newcommand*{\rCCong}{\rChc\rCong}
+\newcommand*{\rCCongF}{\rCCong\rF}
+\newcommand*{\rCCongL}{\rCCong\rL}
+\newcommand*{\rCCongR}{\rCCong\rR}
+% choice simplification
+\newcommand*{\rCL}{\rChc\rFL}
+\newcommand*{\rCR}{\rChc\rFR}
+\newcommand*{\rCIdemp}{\rChc\rIdemp}
+% choice formula
+\newcommand*{\rCJoin}{\rChc\rSep\rJoin}
+\newcommand*{\rCJoinC}{\rCJoin\rSep\rComp}
+\newcommand*{\rCMeet}{\rChc\rSep\rMeet}
+\newcommand*{\rCMeetC}{\rCMeet\rSep\rComp}
+% choice distribution
+\newcommand*{\rCOSwap}{\rCO\rSwap}
+\newcommand*{\rCOSwapL}{\rCOSwap\rL}
+\newcommand*{\rCOSwapR}{\rCOSwap\rR}
+\newcommand*{\rCCSwap}{\rCC\rSwap}
+\newcommand*{\rCCSwapL}{\rCCSwap\rL}
+\newcommand*{\rCCSwapR}{\rCCSwap\rR}
+% choice merge
+\newcommand*{\rCCMerge}{\rCC\rMerge}
+\newcommand*{\rCCMergeL}{\rCCMerge\rL}
+\newcommand*{\rCCMergeR}{\rCCMerge\rR}
+
+% language names
+
+% tag
+\newcommand*{\tagE}{\OB{t}}
+\newcommand*{\tagS}{\OB{T}}
+\newcommand*{\tagL}{\CCkeyw{L}}
+\newcommand*{\tagR}{\CCkeyw{R}}
+\newcommand*{\tagLL}{\CCkeyw{1}}
+\newcommand*{\tagLR}{\CCkeyw{2}}
+\newcommand*{\tagRL}{\CCkeyw{3}}
+\newcommand*{\tagRR}{\CCkeyw{4}}
+% dimension
+\newcommand*{\dE}{\OB{d}}
+\newcommand*{\dS}{\OB{D}}
+% configuration
+\newcommand*{\cE}{\OB{c}}
+\newcommand*{\cS}{\OB{C}}
+% formula
+\newcommand*{\fE}{\OB{f}}
+\newcommand*{\fS}{\OB{F}}
+\newcommand*{\fSem}[2][{}]{\OB{\fS\sem[#1]{#2}}}
+% object language
+\newcommand*{\aE}{\OB{a}}
+\newcommand*{\aS}{\OB{A}}
+\newcommand*{\objE}{\OB{x}}
+\newcommand*{\objS}{\OB{X}}
+\newcommand*{\objEmpty}{\OB{\varepsilon}}
+\renewcommand*{\tr}[2][\aE]{\OB{#1\sub{#2}}} % TODO: rewrite this
+% choice calculus
+\newcommand*{\ccE}{\OB{e}}
+\newcommand*{\ccS}{\OB{E}}
+\newcommand*{\ccSem}[2][{}]{\OB{\ccS\sem[#1]{#2}}}
+% value
+\newcommand*{\val}{\OB{x}}
+\newcommand*{\valy}{\OB{y}}
+\newcommand*{\Val}{\OB{X}}
+\newcommand*{\ValY}{\OB{Y}}
+% lifted value
+\newcommand*{\Bot}{\OB{\bot}}
+%\newcommand*{\lval}{\OB{x}}
+\newcommand*{\LVal}[1][\Val]{\OB{#1_{\Bot}}}
+\newcommand*{\LValY}{\LVal[\ValY]}
+% variational value
+\newcommand*{\var}{\OB{v}}
+\newcommand*{\Var}[1][\LVal]{\OB{V\,{#1}}}
+\newcommand*{\VarY}{\Var[\LValY]}
+% list
+\newcommand*{\lst}{\OB{l}}
+\newcommand*{\Lst}[1][\Val]{\OB{L\,{#1}}}
+\newcommand*{\OLst}[1][\Val]{\OB{O\,{#1}}}
+\newcommand*{\nil}{\OB{\varepsilon}}
+% functions
+\newcommand*{\sel}{\CCname{sel}}
+\newcommand*{\osel}{\CCname{osel}}
+\newcommand*{\lmap}{\CCname{map}}
+\newcommand*{\omap}{\CCname{omap}}
+\newcommand*{\hmap}{\CCname{hmap}}
+\newcommand*{\lbind}{\CCname{bind}}
+\newcommand*{\obind}{\CCname{obind}}
+\newcommand*{\hbind}{\CCname{hbind}}
+\newcommand*{\hzip}{\CCname{hzip}}
+% generalization
+\newcommand*{\TConsU}[1][(\cdot)]{\OB{U\,{#1}}}
+\newcommand*{\TConsW}[1][(\cdot)]{\OB{W\,{#1}}}
+\newcommand*{\TConsVU}{\OB{V\comp U}}
+\newcommand*{\TConsUX}[1][\Val]{\TConsU[\Val]}
+\newcommand*{\TConsWX}[1][\Val]{\TConsW[\Val]}
+\newcommand*{\TConsUY}{\TConsU[\ValY]}
+\newcommand*{\TConsWY}{\TConsW[\ValY]}
+\newcommand*{\wsel}{\CCname{wsel}}
+
+% other names
+
+% abstraction
+\newcommand*{\lam}[2]{\OB{\lambda#1.#2}}
+% list operators
+\newcommand*{\cons}{\mathbin{::}}
+\newcommand*{\concat}{\mathbin{+\mkern-3mu+}}
+% function composition
+\newcommand*{\comp}{\circ}
+% concrete list syntax
+\newcommand*{\clst}[1]{\OB{\lbrack#1\rbrack}}
